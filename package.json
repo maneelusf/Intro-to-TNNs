@@ -5,7 +5,7 @@
   "license": "MIT",
   "description": "Learning yarn and d3",
   "author": "Maneel",
-  "homepage": "https://github.com/maneelusf/tnn.github.io",
+  "homepage": "https://maneelusf.github.io/Intro-to-TNNs",
   "engines": {
     "node": ">=8.9.0"
   },
