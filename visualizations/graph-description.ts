@@ -67,6 +67,9 @@ export class GraphDescription {
         const points = d.map(node => `${pos(node.x)+positions[index][0]},${pos(node.y)}`).join(' ');
         return points;})
         .attr('fill','transparent')
+        .attr('stroke', 'transparent')
+      .attr('stroke-width', 2)
+      // .attr('stroke-dasharray', '5,5')
         .on('mouseover', (d, i) => {this.selectedFaceIdx = i;this.highlightFaces(holder)})
         .on('mouseout', () => this.unhighlightAll())}
       
@@ -160,6 +163,30 @@ export class GraphDescription {
           return "transparent";
       }
   })
+  .attr("stroke", (d, i) => {
+    if (this.selectedFaceIdx == i) {
+        return "#f7a3f6";
+    } else {
+        return "transparent";
+    }
+})
+.attr("stroke-width", (d, i) => {
+  if (this.selectedFaceIdx == i) {
+      return 5;
+  } else {
+      return 2;
+  }
+})
+// .attr("fill", (d, i) => {
+//   if (this.selectedFaceIdx == i) {
+//       selectedPolygonData = d; // Store the data where selectedFaceIdx == i
+//       return '#acbef6';
+//   } else {
+//       return "transparent";
+//   }
+// })
+  
+
   // .style("stroke", '#000')
   // .style("stroke-width", 3);
   // const selectedlinks = new Set()
@@ -207,7 +234,9 @@ export class GraphDescription {
       .style("stroke-width", '1px');
     
     this.parent.selectAll('polygon')
-    .attr("fill","transparent");
+    .attr("fill","transparent")
+    .attr("stroke-width",'1px')
+    .attr("stroke","#bbb");
     // .style("stroke","transparent");
 
     this.parent.selectAll('circle')
