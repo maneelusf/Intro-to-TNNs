@@ -26927,7 +26927,9 @@ var GraphDescription = /** @class */function () {
             return pos(node.x) + positions[index][0] + "," + pos(node.y);
           }).join(' ');
           return points;
-        }).attr('fill', 'transparent').on('mouseover', function (d, i) {
+        }).attr('fill', 'transparent').attr('stroke', 'transparent').attr('stroke-width', 2)
+        // .attr('stroke-dasharray', '5,5')
+        .on('mouseover', function (d, i) {
           _this.selectedFaceIdx = i;
           _this.highlightFaces(holder);
         }).on('mouseout', function () {
@@ -27008,7 +27010,27 @@ var GraphDescription = /** @class */function () {
       } else {
         return "transparent";
       }
+    }).attr("stroke", function (d, i) {
+      if (_this.selectedFaceIdx == i) {
+        return "#f7a3f6";
+      } else {
+        return "transparent";
+      }
+    }).attr("stroke-width", function (d, i) {
+      if (_this.selectedFaceIdx == i) {
+        return 5;
+      } else {
+        return 2;
+      }
     });
+    // .attr("fill", (d, i) => {
+    //   if (this.selectedFaceIdx == i) {
+    //       selectedPolygonData = d; // Store the data where selectedFaceIdx == i
+    //       return '#acbef6';
+    //   } else {
+    //       return "transparent";
+    //   }
+    // })
     // .style("stroke", '#000')
     // .style("stroke-width", 3);
     // const selectedlinks = new Set()
@@ -27041,7 +27063,7 @@ var GraphDescription = /** @class */function () {
   GraphDescription.prototype.unhighlightAll = function () {
     this.selectedFaceIdx = -1;
     this.parent.selectAll('line.vis').style("stroke", "#bbb").style("stroke-width", '1px');
-    this.parent.selectAll('polygon').attr("fill", "transparent");
+    this.parent.selectAll('polygon').attr("fill", "transparent").attr("stroke-width", '1px').attr("stroke", "#bbb");
     // .style("stroke","transparent");
     this.parent.selectAll('circle').style("stroke-width", '1px').style("stroke", '#aaa').attr("r", 10);
     this.parent.selectAll('rect').style("stroke-width", 2).style("stroke", '#ddd');
