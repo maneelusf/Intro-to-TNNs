@@ -24,39 +24,9 @@ d3.keys(d3_jp).forEach(key => {
   } catch (e) {
   }
 });
-import {graphLevel} from './visualizations/graph-level';
-import {graphToTensor} from './visualizations/graph-to-tensor';
-import {imageAsGraph} from './visualizations/image-as-graph';
-import {LayerwiseTrace} from './visualizations/layerwise_trace';
-import {XsAsGraphs} from './visualizations/mols-as-graph';
-import {nodeLevel} from './visualizations/node-level';
-import {pcaLayers} from './visualizations/pca-layers';
-import {nodeStep} from './visualizations/node-step';
-import {nodeStepSmall} from './visualizations/node-step-small';
-import {shuffleSm} from './visualizations/shuffle-sm';
-import {poolingTable} from './visualizations/pooling-table';
-import {TextAsGraph} from './visualizations/text-as-graph';
-import {Playground} from './visualizations/playground/index';
 import { GraphDescription } from './visualizations/graph-description';
-import { Table } from './visualizations/table';
-import { GraphDescriptionEmbeddings } from './visualizations/graph-description-embeddings';
 
 
 window.onload = function() {
-  pcaLayers();
-  nodeStepSmall();
-  poolingTable();
-  nodeLevel();
-  graphLevel();
-  graphToTensor();
-  nodeStep();
-  shuffleSm();
-  new LayerwiseTrace();
-  new TextAsGraph();
-  new XsAsGraphs();
-  new Playground();
   new GraphDescription();
-  new GraphDescriptionEmbeddings();
-  imageAsGraph();
-  new Table();
 };

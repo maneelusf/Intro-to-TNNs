@@ -1,5 +1,8 @@
 #graph-description {
   display: flex;
+  position: relative;
+  height: 380px;
+  width: 1200px
 }
 
 .line-holder {
@@ -22,7 +25,7 @@
 }
 .line-holder.selected{
   background: #efefef;
-  border-radius: 10px;
+  border-radius: 20px;
 }
 
 /*# sourceMappingURL=/graph-description.c0d85959.css.map */

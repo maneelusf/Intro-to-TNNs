@@ -25,16 +25,13 @@ export const BG_COLOR = 'rgb(255, 254, 247)';
 
 /** Make a graph. Returns an array of node dicts.*/
 export function makeGraph(numNodes, expNumEdges, addSelfLoops = true) {
-  const idxs = range(numNodes);
-  const nodes = idxs.map(i => {
-    return {
-      i: i, x: Math.cos(i / numNodes * 2 * Math.PI) / 2,
-      y: Math.sin(i / numNodes * 2 * Math.PI) / 2, neighbors: [],
-      color: d3.schemeDark2[i % 8]
-    }
-  })
+  const points = [[0.5,0.15],[0.2,-0.2],[-0.4,-0.2],[-0.4,0.5],[0.2,0.5],[0.5,-0.5]];
+  const nodes = points.map((point,index) => {return {i:index, x:point[0],y:point[1],neighbors: [],
+    color: d3.schemeDark2[index % 8] }})
 
   const links = [];
+  // List of connections. 
+  const connections = [[0,1],[1,2],[2,3],[3,4],[4,0],[1,5],[2,4],[1,4]];
 
   // Add a link between two nodes
   const addNeighbor =
@@ -52,18 +49,10 @@ export function makeGraph(numNodes, expNumEdges, addSelfLoops = true) {
         links.push({ a: b, b: a });
       }
     }
+    for (let i = 0;i < connections.length;i++) {
 
-  // Add a bunch of random edges.
-  for (let i = 0; i < expNumEdges; i++) {
-    const idx = i % numNodes;
-    if (addSelfLoops) {
-      addNeighbor(idx, idx);
+      addNeighbor(connections[i][0],connections[i][1]);
     }
-    let neighIdx = Math.floor(random[i] * numNodes);
-    if (idx != neighIdx) {
-      addNeighbor(idx, neighIdx);
-    }
-  }
 
   return [nodes, links]
 }
@@ -76,29 +65,6 @@ export function range(n: number) {
   return Array.from(Array(n).keys())
 }
 
-/**
- * Shuffles array in place. ES6 version
- * @param {Array} a items An array containing the items.
- */
-export function shuffle(a) {
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-/**
- * Performs a swap of two random elements in an array,
- * @param {Array} a items An array containing the items.
- */
-export function oneSwap(a) {
-  const i = Math.floor(Math.random() * a.length);
-  const j = Math.floor(Math.random() * a.length);
-  [a[i], a[j]] = [a[j], a[i]];
-
-  return a;
-}
 
 export function transposeArray(array) {
   return array[0].map((col, i) => array.map(row => row[i]));

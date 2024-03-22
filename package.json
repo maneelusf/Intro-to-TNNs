@@ -1,9 +1,11 @@
 {
-  "name": "gnn-distill",
+  "name": "learningjs",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
-  "license": "Apache-2.0",
+  "license": "MIT",
+  "description": "Learning yarn and d3",
+  "author": "Maneel",
+  "homepage": "https://github.com/maneelusf/tnn.github.io",
   "engines": {
     "node": ">=8.9.0"
   },
@@ -31,6 +33,7 @@
     "babel-preset-env": "^1.7.0",
     "clang-format": "~1.2.2",
     "cross-env": "~5.1.6",
+    "gh-pages": "^6.1.1",
     "parcel-bundler": "^1.12.3",
     "parcel-plugin-static-files-copy": "^2.3.1",
     "ts-node": "^8.3.0",
@@ -39,12 +42,13 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development parcel index.html --no-hmr --out-dir=./public",
     "start-hmr": "cross-env NODE_ENV=development parcel index.html --out-dir=./public",
-    "build": "cross-env NODE_ENV=production parcel build index.html --no-content-hash --no-minify --public-url ./ --out-dir=./public && bin/build.sh",
-    "clean": "rm -r public"
+    "build": "cross-env NODE_ENV=production parcel build index.html --no-content-hash --no-minify --public-url ./ --out-dir=./public",
+    "clean": "rm -r public",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d public"
   },
   "staticFiles": {
     "staticPath": "data",
     "watcherGlob": "**"
-  },
-  "author": ""
+  }
 }
