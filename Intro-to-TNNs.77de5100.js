@@ -27000,7 +27000,7 @@ var GraphDescription = /** @class */function () {
     // Cell Complex is different from the others. 
     hyperHolder.selectAll('rect.face_one').data([nodes[4], nodes[1]]).enter().append('rect.face_one').attr("x", pos(nodes[2].x) - 30 + positions[3][0]).attr("y", pos(nodes[2].y) - 35).attr("width", 180).attr("height", 200).attr("rx", 30) // Set the x-axis radius for rounded corners
     .attr("ry", 30) // Set the y-axis radius for rounded corners
-    .style("fill", "lightblue").style("fill-opacity", 0.5).on('mouseover', function () {
+    .style("fill", '#acbef6').style("fill-opacity", 0.5).on('mouseover', function () {
       return _this.highlightHyperEdge(hyperHolder, "face_one");
     }).on('mouseout', function () {
       return _this.unhighlightAll();
@@ -27038,7 +27038,7 @@ var GraphDescription = /** @class */function () {
     }];
     var path = this.roundedPolygon(p, 25);
     // console.log(path);
-    hyperHolder.append('path').attr('d', path).style('fill', 'lightblue').style("fill-opacity", 0.5).on('mouseover', function () {
+    hyperHolder.append('path').attr('d', path).style('fill', '#acbef6').style("fill-opacity", 0.5).on('mouseover', function () {
       return _this.highlightHyperEdge(hyperHolder, "path");
     }).on('mouseout', function () {
       return _this.unhighlightAll();
@@ -27172,7 +27172,7 @@ exports.GraphDescription = GraphDescription;
 "use strict";
 
 /**
- * @license
+//  * @license
  * Copyright 2018 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
