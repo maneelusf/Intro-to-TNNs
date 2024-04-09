@@ -26,13 +26,14 @@
 
 <link rel="stylesheet" href="style.e308ff8e.css">
 <link rel="stylesheet" href="graph-description.c0d85959.css">
+<link rel="stylesheet" href="table.0b6daf45.css"> 
 <!-- <link rel="stylesheet" href="visualizations/shuffle.css">
 <link rel="stylesheet" href="visualizations/text-as-graph.css">
 <link rel="stylesheet" href="visualizations/pca-layers.css">
 <link rel="stylesheet" href="visualizations/playground/gnn-playground.css">
 <link rel="stylesheet" href="visualizations/mols-as-graph.css">
 <link rel="stylesheet" href="visualizations/shuffle-sm.css">
-<link rel="stylesheet" href="visualizations/table.css">
+
 
 <link rel="stylesheet" href="visualizations/graph-description-embeddings.css"> --> 
 
@@ -100,6 +101,17 @@
   Despite the success of Graphs in various deep learning applications, seeing graphs purely through a geometric point of view
   can 
 </p>
+<p><strong>Citation networks as graphs.</strong> Scientists routinely cite other scientists’ work when publishing papers. We can visualize these networks of citations as a graph, where each paper is a node, and each <em>directed</em> edge is a citation between one paper and another. Additionally, we can add information about each paper into each node, such as a word embedding of the abstract. (see <d-cite key="Mikolov2013-vr"></d-cite>,  <d-cite key="Devlin2018-mi"></d-cite> ,  <d-cite key="Pennington2014-kg"></d-cite>). </p>
+<p><strong>Other examples.</strong> In computer vision, we sometimes want to tag objects in visual scenes. We can then build graphs by treating these objects as nodes, and their relationships as edges. <a href="https://www.tensorflow.org/tensorboard/graphs">Machine learning models</a>, <a href="https://openreview.net/pdf?id=BJOFETxR-">programming code</a> <d-cite key="Allamanis2017-kz"></d-cite> and <a href="https://openreview.net/forum?id=S1eZYeHFDS">math equations</a><d-cite key="Lample2019-jg"></d-cite> can also be phrased as graphs, where the variables are nodes, and edges are operations that have these variables as input and output. You might see the term “dataflow graph” used in some of these contexts.</p>
+<p>The structure of real-world graphs can vary greatly between different types of data — some graphs have many nodes with few connections between them, or vice versa. Graph datasets can vary widely (both within a given dataset, and between datasets) in terms of the number of nodes, edges, and the connectivity of nodes.</p>
+<figure>
+<div id="table"></div>
+<figcaption>
+
+<p>Summary statistics on graphs found in the real world. Numbers are dependent on featurization decisions. More useful statistics and graphs can be found in KONECT<d-cite key="Kunegis2013-er"></d-cite></p>
+</figcaption></figure>
 </d-article>
+
+
 
 </body>

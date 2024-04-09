@@ -17,6 +17,8 @@
 
 import * as d3 from 'd3';
 import * as d3_jp from 'd3-jetpack';
+import { Table } from './visualizations/table';
+import { GraphDescription } from './visualizations/graph-description';
 
 d3.keys(d3_jp).forEach(key => {
   try {
@@ -24,9 +26,10 @@ d3.keys(d3_jp).forEach(key => {
   } catch (e) {
   }
 });
-import { GraphDescription } from './visualizations/graph-description';
+
 
 
 window.onload = function() {
   new GraphDescription();
+  new Table();
 };
