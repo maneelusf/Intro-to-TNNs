@@ -1,0 +1,31 @@
+.table-holder {
+    border: 1px solid #ddd;
+    font-size: 14px;
+    width: 100%;
+  }
+
+.row-header {
+  background-color: #feebd0;
+  border: 1px solid #ddd;
+}
+
+  .neighborhood-matrix,
+  .neighborhood-structure {
+    width: 15%;
+    border: 1px solid #ddd;
+
+  }
+  .cell-complex,
+  .examples {
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  .boundary {
+    height: 200px;
+    width: 15%;
+    border: 1px solid #ddd;
+
+  }
+  
+
+/*# sourceMappingURL=table.0b6daf45.css.map */

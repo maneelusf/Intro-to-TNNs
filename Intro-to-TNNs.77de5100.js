@@ -26836,7 +26836,247 @@ function transposeArray(array) {
 }
 exports.transposeArray = transposeArray;
 exports.random = [0.8751547364867525, 0.48703812515796163, 0.8853204837081521, 0.03665311234463231, 0.23381064092464188, 0.1348978356430306, 0.22403539718976173, 0.3516201087350268, 0.7266955195539337, 0.6939039610600852, 0.8115480860772051, 0.942291564934004, 0.32194106866015937, 0.25009618855008653, 0.7080826345629236, 0.4939836911933573, 0.5014807336560756, 0.4737558995199409, 0.28710635767250237, 0.7964228372249633, 0.23253366029986888, 0.15483341728099065, 0.9345549284963193, 0.524955190250286, 0.6707212640501186, 0.7244359946992129, 0.7657905625129635, 0.8876179001611688, 0.9089860690353977, 0.24414589490697258, 0.5495009844296725, 0.24037904275862543, 0.23375887188493127, 0.4228034514858334, 0.8150696192224922, 0.9457617171748411, 0.9356088401710381, 0.19650389991765604, 0.8847894963326248, 0.35644919218553217, 0.5369822013711312, 0.8981427214369839, 0.12173002385407439, 0.7885399102681385, 0.6038962958499163, 0.9491701879192804, 0.504586805255812, 0.43381024751262043, 0.1192159581227159, 0.4637076888455671, 0.0664066640625911, 0.8116805145981689, 0.1688798619172125, 0.291941485508016, 0.03968541868376496, 0.44562044111161203, 0.3546124859624551, 0.4985561778061718, 0.9696307021061441, 0.7928660276262496, 0.8283640028953678, 0.29190842262392414, 0.5258805863949767, 0.5611161309056327, 0.32514113410708, 0.643317831977311, 0.7355739231040863, 0.4147825775759493, 0.33050996204386496, 0.008034734400914179, 0.6276950790241489, 0.9245137339797826, 0.472061301009185, 0.3532309299788585, 0.09164645791020698, 0.5156001816013349, 0.9119637599183463, 0.8756499936035242, 0.05716932192137447, 0.2314874929334958, 0.6953957713650021, 0.47350835075512365, 0.8084836033123066, 0.5699267565105148, 0.21852879642369216, 0.7243632224721468, 0.16131849951161392, 0.4720328938939866, 0.6657903175402973, 0.6945192084721554, 0.2291629468515488, 0.4649852497667464, 0.374672659806516, 0.7086801070542101, 0.9912449229828748, 0.5244383583477008, 0.08411007283516292, 0.19848866811984944, 0.15651572462481145, 0.5067791470738072];
-},{"d3":"BG5c"}],"yqcI":[function(require,module,exports) {
+},{"d3":"BG5c"}],"pEq1":[function(require,module,exports) {
+"use strict";
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  __setModuleDefault(result, mod);
+  return result;
+};
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Table = void 0;
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+var d3 = __importStar(require("d3"));
+var utils_1 = require("../utils");
+var Table = /** @class */function () {
+  function Table() {
+    this.numNodes = 6;
+    this.selectedNode = -1;
+    this.selectedEdge = -1;
+    this.selectedFace = -1;
+    this.data_dict = {
+      0: 'circle',
+      1: 'link',
+      2: 'faces'
+    };
+    //create the required data.
+    var _a = utils_1.makeGraph(this.numNodes, this.numNodes * 2),
+      nodes = _a[0],
+      links = _a[1];
+    var faces = [[nodes[4], nodes[1], nodes[2]], [nodes[2], nodes[4], nodes[3]], [nodes[0], nodes[1], nodes[4]]];
+    nodes.rank = 0;
+    links.rank = 1;
+    faces.rank = 2;
+    this.faces = faces;
+    this.links = links;
+    this.nodes = nodes;
+    var link = document.createElement('link', {
+      rel: 'stylesheet',
+      href: 'table.css'
+    });
+    document.getElementById('table').appendChild(link);
+    // Create the table element
+    var table = document.createElement('table');
+    table.className = 'table-holder';
+    // Create the header row
+    var headerRow = document.createElement('tr');
+    headerRow.className = 'row-header';
+    // Create the header cells
+    var matrixHeader = document.createElement('th');
+    matrixHeader.className = 'neighborhood-matrix';
+    matrixHeader.rowSpan = 1;
+    matrixHeader.innerHTML = '<b>Neighborhood</b><br><b>Matrix</b>';
+    var structureHeader = document.createElement('th');
+    structureHeader.className = 'neighborhood-structure';
+    structureHeader.rowSpan = 1;
+    structureHeader.innerHTML = '<b>Neighborhood</b><br><b>Structure</b>';
+    var complexHeader = document.createElement('th');
+    complexHeader.className = 'cell-complex';
+    complexHeader.colSpan = 1;
+    complexHeader.innerHTML = '<b>Cell Complex</b>';
+    // Append header cells to header row
+    headerRow.appendChild(matrixHeader);
+    headerRow.appendChild(structureHeader);
+    headerRow.appendChild(complexHeader);
+    // Create the second row
+    var secondRow = document.createElement('tr');
+    secondRow.className = 'row-header';
+    // Create the boundary row
+    var boundaryRow = document.createElement('tr');
+    boundaryRow.className = 'boundary';
+    // Create the cells for the boundary row
+    var boundaryCell1 = document.createElement('td');
+    boundaryCell1.className = 'boundary-cell-one';
+    boundaryCell1.innerHTML = 'boundary-cell';
+    var boundaryCell2 = document.createElement('td');
+    boundaryCell2.className = 'boundary-cell-two'; // Give an ID to the cell for appending SVG
+    boundaryCell2.innerHTML = 'Hello who is this';
+    var boundaryCell3 = document.createElement('td');
+    boundaryCell3.className = 'boundary-cell'; // Give an ID to the cell for appending SVG
+    // Append boundary cells to boundary row
+    boundaryRow.appendChild(boundaryCell1);
+    boundaryRow.appendChild(boundaryCell2);
+    boundaryRow.appendChild(boundaryCell3);
+    // Append all rows to the table
+    table.appendChild(headerRow);
+    table.appendChild(secondRow);
+    table.appendChild(boundaryRow);
+    // Append the table to the div
+    document.getElementById('table').appendChild(table);
+    // Create SVG elements and draw diagrams
+    var svg = d3.select("td.boundary-cell").append('svg').attr('width', 450).attr('height', 200);
+    var ex1 = svg.append('g');
+    var ex2 = svg.append('g');
+    var data = {
+      1: nodes,
+      2: links,
+      3: faces
+    };
+    this.drawDiagram(ex1, ex2, 30, 0, true);
+    this.drawDiagram(ex2, ex1, 250, 0, false);
+  }
+  Table.prototype.drawDiagram = function (holder, ref_holder, x, y, select) {
+    var _this = this;
+    var localOffset = 0.6;
+    var localScale = 150;
+    var pos = function pos(x) {
+      return (x + localOffset) * localScale;
+    };
+    holder.selectAll("polygon").data(this.faces).enter().append('polygon').attr('points', function (d) {
+      var points = d.map(function (node) {
+        return pos(node.x) + x + "," + (pos(node.y) + y);
+      }).join(' ');
+      return points;
+    }).attr('fill', '#e7e8e9').attr('stroke', 'transparent').attr('stroke-width', 2).classed("{selected}", true).on('mouseover', function (d, i) {
+      _this.selectedFace = i;
+      _this.boundarycells(holder, ref_holder, select, 2);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll('line.vis').data(this.links).enter().append('line').classed('vis', true).style("stroke", "#e7e8e9").style("stroke-width", 5).attr("x1", function (d) {
+      return pos(d.a.x) + x;
+    }).attr("x2", function (d) {
+      return pos(d.b.x) + x;
+    }).attr("y1", function (d) {
+      return pos(d.a.y) + y;
+    }).attr("y2", function (d) {
+      return pos(d.b.y) + y;
+    }).on('mouseover', function (d, i) {
+      _this.selectedEdge = i;
+      _this.boundarycells(holder, ref_holder, select, 1);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll('circle').data(this.nodes).enter().append('circle').attr('r', 10).attr('cx', function (d) {
+      return pos(d.x) + x;
+    }).attr('cy', function (d) {
+      return pos(d.y) + y;
+    }).style('fill', '#e7e8e9').style("stroke-width", '1px').style("stroke", '#bbb').on('mouseover', function (d, i) {
+      _this.selectedNode = i;
+      _this.boundarycells(holder, ref_holder, select, 0);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+  };
+  Table.prototype.unhighlightAll = function (holder, ref_holder) {
+    this.selectedEdge = -1;
+    this.selectedNode = -1;
+    this.selectedFace = -1;
+    holder.selectAll('circle').style('fill', '#e7e8e9');
+    holder.selectAll('line.vis').style("stroke", "#e7e8e9");
+    holder.selectAll('polygon').style("fill", "#e7e8e9");
+    ref_holder.selectAll('circle').style('fill', '#e7e8e9');
+    ref_holder.selectAll('line.vis').style("stroke", "#e7e8e9");
+    ref_holder.selectAll('polygon').style("fill", "#e7e8e9");
+  };
+  Table.prototype.boundarycells = function (holder, ref_holder, select, rank) {
+    var _this = this;
+    if (select == false) {
+      return;
+    }
+    if (rank <= 0) {
+      return;
+    }
+    if (rank == 1) {
+      holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return i === _this.selectedEdge ? "#c27e9e" : "#e7e8e9";
+      });
+      var edgeselection = this.links.filter(function (link, i) {
+        return i === _this.selectedEdge;
+      });
+      var uniqueNodes_1 = new Set();
+      edgeselection.forEach(function (link) {
+        uniqueNodes_1.add(link.a.i);
+        uniqueNodes_1.add(link.b.i);
+      });
+      console.log(uniqueNodes_1);
+      var nodesArray_1 = Array.from(uniqueNodes_1);
+      ref_holder.selectAll('circle').style('fill', function (d, i) {
+        return nodesArray_1.includes(i) ? "#c0dbe7" : "#e7e8e9";
+      });
+    }
+    if (rank == 2) {
+      holder.selectAll('polygon').style('fill', function (d, i) {
+        return i === _this.selectedFace ? "#87023e" : "#e7e8e9";
+      });
+      var faceselection = this.faces.filter(function (link, i) {
+        return i === _this.selectedFace;
+      }).map(function (face) {
+        return face.map(function (node) {
+          return node.i;
+        });
+      });
+      var uniqueNodes = new Set();
+      uniqueNodes.add.apply(uniqueNodes, faceselection);
+      console.log({
+        'nodes': uniqueNodes
+      });
+    }
+  };
+  return Table;
+}();
+exports.Table = Table;
+},{"d3":"BG5c","../utils":"UnXq"}],"yqcI":[function(require,module,exports) {
 "use strict";
 
 /**
@@ -27219,14 +27459,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 var d3 = __importStar(require("d3"));
 var d3_jp = __importStar(require("d3-jetpack"));
+var table_1 = require("./visualizations/table");
+var graph_description_1 = require("./visualizations/graph-description");
 d3.keys(d3_jp).forEach(function (key) {
   try {
     d3[key] = d3_jp[key];
   } catch (e) {}
 });
-var graph_description_1 = require("./visualizations/graph-description");
 window.onload = function () {
   new graph_description_1.GraphDescription();
+  new table_1.Table();
 };
-},{"d3":"BG5c","d3-jetpack":"dPnC","./visualizations/graph-description":"yqcI"}]},{},["QCba"], null)
+},{"d3":"BG5c","d3-jetpack":"dPnC","./visualizations/table":"pEq1","./visualizations/graph-description":"yqcI"}]},{},["QCba"], null)
 //# sourceMappingURL=Intro-to-TNNs.77de5100.js.map
