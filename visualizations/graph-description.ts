@@ -22,7 +22,7 @@ import { makeGraph, sleep } from '../utils';
 
 export class GraphDescription {
   parent = d3.select('#graph-description');
-  svg = this.parent.append('svg').attr('width':1200);
+  svg = this.parent.append('svg').attr('width', 1200);
   numNodes = 6;
   constructor() {
     const [nodes, links] = makeGraph(this.numNodes, this.numNodes * 2);
@@ -64,12 +64,12 @@ export class GraphDescription {
         .text(textElems[index])
         .style("fill", "black")
         .style("font-size", "14px");
-      if holder == hyperHolder {
+      if (holder == hyperHolder) {
         continue;
       }
       // (d, i) => this.highlightFaces(holder)}
       // (d, i) => {this.selectedFaceIdx = i;this.highlightFaces(holder)}
-      if holder == simplicialHolder {
+      if (holder == simplicialHolder) {
         holder.selectAll('polygon')
         .data(SimplicialcomplexFaces)
         .enter()
@@ -84,7 +84,7 @@ export class GraphDescription {
         .on('mouseover', (d, i) => {this.selectedFaceIdx = i;this.highlightFaces(holder)})
         .on('mouseout', () => this.unhighlightAll())}
       
-      if holder == cellHolder {
+      if (holder == cellHolder) {
         holder.selectAll('polygon')
         .data(CellcomplexFaces)
         .enter()
@@ -200,7 +200,7 @@ export class GraphDescription {
         .style("fill-opacity", 0.5)
         .on('mouseover', () => this.highlightHyperEdge(hyperHolder,"face_four"))
         .on('mouseout', () => this.unhighlightAll());
-        const p = [{x: pos(nodes[0].x)+35+positions[3][0], y: pos(nodes[0].y}, {x: pos(nodes[4].x)-15+positions[3][0], y: pos(nodes[4].y)+35},
+        const p = [{x: pos(nodes[0].x)+35+positions[3][0], y: pos(nodes[0].y)}, {x: pos(nodes[4].x)-15+positions[3][0], y: pos(nodes[4].y)+35},
          {x: pos(nodes[1].x)-15+positions[3][0], y: pos(nodes[1].y)-35}]  
         const path = this.roundedPolygon(p, 25);
         // console.log(path);
@@ -366,3 +366,4 @@ roundedPolygon(points, radius) {
       .attr("stroke-width", 1)
       .attr("stroke", '#ddd')
   }
+}
