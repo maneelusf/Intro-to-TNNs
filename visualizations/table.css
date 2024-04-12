@@ -9,21 +9,19 @@
   border: 1px solid #ddd;
 }
 
-  .neighborhood-matrix,
-  .neighborhood-structure {
-    width: 15%;
+.neighborhood-matrix,
+.neighborhood-structure {
     border: 1px solid #ddd;
-
   }
   .cell-complex,
   .examples {
     border: 1px solid #ddd;
     text-align: center;
   }
-  .boundary {
+  /* .boundary {
     height: 200px;
     width: 15%;
     border: 1px solid #ddd;
 
-  }
+  } */
   

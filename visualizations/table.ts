@@ -21,8 +21,6 @@ export class Table {
   selectedNode = -1;
   selectedEdge = -1;
   selectedFace = -1;
-  data_dict = {0:'circle',1:'link',2:'faces'}
-
   constructor() {
     //create the required data.
     const [nodes,links] = makeGraph(this.numNodes, this.numNodes * 2);
@@ -62,53 +60,87 @@ export class Table {
     headerRow.appendChild(structureHeader);
     headerRow.appendChild(complexHeader);
     
+    
     // Create the second row
     const secondRow = document.createElement('tr');
     secondRow.className = 'row-header';
-  
-
-    // Create the boundary row
-    const boundaryRow = document.createElement('tr');
-    boundaryRow.className = 'boundary';
-
-    // Create the cells for the boundary row
-    const boundaryCell1 = document.createElement('td');
-    boundaryCell1.className = 'boundary-cell-one';
-    boundaryCell1.innerHTML = 'boundary-cell';
-    
-    const boundaryCell2 = document.createElement('td');
-    boundaryCell2.className = 'boundary-cell-two'; // Give an ID to the cell for appending SVG
-    boundaryCell2.innerHTML = 'Hello who is this';
-    
-    
-    const boundaryCell3 = document.createElement('td');
-    boundaryCell3.className = 'boundary-cell'; // Give an ID to the cell for appending SVG
-    
-    // Append boundary cells to boundary row
-    boundaryRow.appendChild(boundaryCell1);
-    boundaryRow.appendChild(boundaryCell2);
-    boundaryRow.appendChild(boundaryCell3);
-    // Append all rows to the table
+    const neighborhoodstructure = ["boundary","co-boundary","lower-adjacent","upper-adjacent"]
+    const neighborhoodstructurehtml = 
+    [
+      'Boundary<br><span style="font-size: smaller; font-style: italic;">All y-connected cells x cells of next lower rank</span>',
+      'Co-boundary<br><span style="font-size: smaller; font-style: italic;">All y-connected cells x cells of next higher rank</span>',
+      'Lower adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a boundary z with y</span>',
+      'Upper adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a co-boundary z with y</span>',
+    ] 
     table.appendChild(headerRow);
     table.appendChild(secondRow);
-    table.appendChild(boundaryRow);
+    for (let i = 0; i <neighborhoodstructure.length; i++) {
+      const boundaryRow = document.createElement('tr');
+      boundaryRow.className = neighborhoodstructure[i];
+      const boundaryCell1 = document.createElement('td');
+      boundaryCell1.className = neighborhoodstructure[i];
+      boundaryCell1.innerHTML = neighborhoodstructurehtml[i];
+      const boundaryCell2 = document.createElement('td');
+      boundaryCell2.className = `${neighborhoodstructure[i]}one`; // Give an ID to the cell for appending SVG
+      boundaryCell2.innerHTML = 'Lorem Ipsum';
+      const boundaryCell3 = document.createElement('td');
+      boundaryCell3.className = `${neighborhoodstructure[i]}two`; // Give an ID to the cell for appending SVG
+      // Append boundary cells to boundary row
+      boundaryRow.appendChild(boundaryCell1);
+      boundaryRow.appendChild(boundaryCell2);
+      boundaryRow.appendChild(boundaryCell3);
+      table.appendChild(boundaryRow);
+      
 
-    // Append the table to the div
+    }
     document.getElementById('table').appendChild(table);
+    // Define an array of classes for different table cells
+    const cellClasses = ["boundarytwo", "co-boundarytwo", "lower-adjacenttwo", "upper-adjacenttwo"];
 
-    // Create SVG elements and draw diagrams
-    let svg = d3.select("td.boundary-cell").append('svg').attr('width', 450).attr('height', 200);
-    const ex1 = svg.append('g');
-    const ex2 = svg.append('g');
-    const data = {1:nodes,2:links,3:faces}
-    this.drawDiagram(ex1,ex2,30,0,true);
-    this.drawDiagram(ex2,ex1,250,0,false);
+    // Loop through each cell class
+    cellClasses.forEach(cellClass => {
+        // Select the table cell and append an SVG element
+        let svg = d3.select(`td.${cellClass}`).append('svg').attr('width', 450).attr('height', 200);
+        const ex1 = svg.append('g');
+        const ex2 = svg.append('g');
+        const arrow = svg.append('g')
+        
+        this.drawDiagram(ex1, 30, 0);
+        this.drawDiagram(ex2, 250, 0);
+        arrow.append("line")
+        .attr("x1", 220)
+        .attr("y1", 110)
+        .attr("x2", 270)
+        .attr("y2", 110)
+        .style("stroke", "black")
+        .style("stroke-width", 1)
+
+
+        // Attach appropriate mouseover event handler based on the class
+        if (cellClass === "boundarytwo") {
+            this.mouseoverboundary(ex1, ex2);
+        } else if (cellClass === "co-boundarytwo") {
+            this.mouseovercoboundary(ex1, ex2);
+        }
+        else if (cellClass === "lower-adjacenttwo") {
+          this.mouseoverloweradjacent(ex1,ex2);
+        }
+        else if (cellClass === "upper-adjacenttwo") {
+          this.mouseoverupperadjacent(ex1,ex2);
+        }
+    });
+
+
+    
+    
+    // this.drawDiagram(ex1,ex2,30,0,true);
+    // this.drawDiagram(ex2,ex1,250,0,false);
   }
-
-  drawDiagram(holder,ref_holder, x, y, select: true) {
+  drawDiagram(holder,x,y) {
     const localOffset = 0.6;
     const localScale = 150;
-    const pos = (x) => (x + localOffset) * localScale;   
+    const pos = (x) => (x + localOffset) * localScale;  
+
     holder.selectAll(`polygon`)
         .data(this.faces)
         .enter()
@@ -118,26 +150,19 @@ export class Table {
         return points})
         .attr('fill','#e7e8e9')
         .attr('stroke', 'transparent')
-      .attr('stroke-width', 2)
-      .classed(`{selected}`, true)
-      .on('mouseover', (d, i) => {this.selectedFace = i;this.boundarycells(holder,ref_holder,select,2)})
-    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
-    
+      .attr('stroke-width', 2);
     holder.selectAll('line.vis')
-    .data(this.links)
-    .enter()
-    .append('line')
-    .classed('vis', true)
-    .style("stroke", "#e7e8e9")
-    .style("stroke-width", 5)
-    .attr("x1", (d) => pos(d.a.x)+x)
-    .attr("x2", (d) => pos(d.b.x)+x)
-    .attr("y1", (d) => pos(d.a.y)+y)
-    .attr("y2", (d) => pos(d.b.y)+y)
-    .on('mouseover', (d, i) => {this.selectedEdge = i;this.boundarycells(holder,ref_holder,select,1)})
-    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
-
-    holder.selectAll('circle')
+      .data(this.links)
+      .enter()
+      .append('line')
+      .classed('vis', true)
+      .style("stroke", "#e7e8e9")
+      .style("stroke-width", 5)
+      .attr("x1", (d) => pos(d.a.x)+x)
+      .attr("x2", (d) => pos(d.b.x)+x)
+      .attr("y1", (d) => pos(d.a.y)+y)
+      .attr("y2", (d) => pos(d.b.y)+y);
+      holder.selectAll('circle')
       .data(this.nodes)
       .enter()
       .append('circle')
@@ -147,10 +172,176 @@ export class Table {
       .style('fill', '#e7e8e9')
       .style("stroke-width", '1px')
       .style("stroke", '#bbb')
-      .on('mouseover', (d, i) => {this.selectedNode = i;this.boundarycells(holder,ref_holder,select,0)})
+  }
+
+  mouseoverboundary(holder,ref_holder) {
+    holder.selectAll(`polygon`)
+    .on('mouseover', (d, i) => {this.selectedFace = i;this.boundarycells(holder,ref_holder,2)})
+    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+    holder.selectAll("line.vis")
+    .on('mouseover', (d, i) => {this.selectedEdge = i;this.boundarycells(holder,ref_holder,1)})
+    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+    holder.selectAll('circle')
+      .on('mouseover', (d, i) => {this.selectedNode = i;this.boundarycells(holder,ref_holder,0)})
       .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
 
   }
+
+  boundarycells(holder,ref_holder, rank) {
+    if (rank <= 0) {
+      return;
+    }
+    if (rank == 1) {
+      holder.selectAll('line.vis')
+      .style('stroke', (d, i) => i === this.selectedEdge ? "#c27e9e" : "#e7e8e9");
+      const edgeselection = this.links.filter((link, i) => i === this.selectedEdge)[0];
+      const selectednodes = this.linksnode(edgeselection,this.nodes).map((node) => node.i);
+      ref_holder.selectAll('circle')
+      .style('fill', (d, i) => selectednodes.includes(i) ? "#c0dbe7" : "#e7e8e9")
+    }
+    if (rank == 2) {
+      holder.selectAll('polygon')
+      .style('fill', (d, i) => i === this.selectedFace ? "#87023e" : "#e7e8e9");
+      const faceselection = this.faces.filter((face, i) => i === this.selectedFace)[0]
+      //Now these are multiple, so how do we check?
+      const selectedlinks = this.facelinks(faceselection,this.links);
+      ref_holder.selectAll('line.vis')
+      .style("stroke", (d, i) => selectedlinks.includes(d) ? "#c27e9e" : "#e7e8e9")
+    }
+    }  
+  mouseovercoboundary(holder,ref_holder) {
+    holder.selectAll(`polygon`)
+    .on('mouseover', (d, i) => {this.selectedFace = i;this.coboundarycells(holder,ref_holder,2)})
+    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+    holder.selectAll("line.vis")
+    .on('mouseover', (d, i) => {this.selectedEdge = i;this.coboundarycells(holder,ref_holder,1)})
+    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+    holder.selectAll('circle')
+      .on('mouseover', (d, i) => {this.selectedNode = i;this.coboundarycells(holder,ref_holder,0)})
+      .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+
+  }
+  coboundarycells(holder,ref_holder, rank) {
+    if (rank >= 2) {
+      return;
+    }
+    if (rank == 1) {
+      holder.selectAll('line.vis')
+      .style('stroke', (d, i) => i === this.selectedEdge ? "#c27e9e" : "#e7e8e9");
+      const edgeselection = this.links.filter((link, i) => i === this.selectedEdge)[0];
+      const selectedfaces = this.linkfaces(edgeselection,this.faces);
+      const faceindices = this.faces.map((face, i) => selectedfaces.includes(face) ? i : -1)
+    .filter(index => index !== -1);
+      ref_holder.selectAll('polygon')
+      .style('fill', (d, i) => faceindices.includes(i) ? "#87023e" : "#e7e8e9");
+    }
+    if (rank == 0) {
+      holder.selectAll('circle')
+      .style('fill', (d, i) => i === this.selectedNode ? "#c0dbe7" : "#e7e8e9");
+      const selectedIndices = this.links
+  .map((link, i) => (link.a.i === this.selectedNode || link.b.i === this.selectedNode) ? i : -1)
+  .filter(index => index !== -1);
+      ref_holder.selectAll('line.vis')
+        .style('stroke', (d, i) => selectedIndices.includes(i) ? "#c27e9e" : "#e7e8e9");
+    }
+    }  
+
+  mouseoverloweradjacent(holder,ref_holder) {
+    holder.selectAll(`polygon`)
+    .on('mouseover', (d, i) => {this.selectedFace = i;this.loweradjacentcells(holder,ref_holder,2)})
+    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+    holder.selectAll("line.vis")
+    .on('mouseover', (d, i) => {this.selectedEdge = i;this.loweradjacentcells(holder,ref_holder,1)})
+    .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+    holder.selectAll('circle')
+      .on('mouseover', (d, i) => {this.selectedNode = i;this.loweradjacentcells(holder,ref_holder,0)})
+      .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+
+  }
+  loweradjacentcells(holder,ref_holder, rank) {
+    if (rank <= 0) {
+      return;
+    }
+    if (rank == 1) {
+      // First select all the nodes. 
+      holder.selectAll('line.vis')
+      .style('stroke', (d, i) => i === this.selectedEdge ? "#c27e9e" : "#e7e8e9");
+      const edgeselection = this.links.filter((link, i) => i === this.selectedEdge)[0];
+      const selectednodes = this.linksnode(edgeselection,this.nodes).map((node) => node.i);
+      ref_holder.selectAll('line.vis')
+      .style('stroke', (d,i) => (selectednodes.includes(d.a.i) || selectednodes.includes(d.b.i)) & !(i === this.selectedEdge) ? "#c27e9e" : "#e7e8e9");
+    }
+    if (rank == 2) {
+      holder.selectAll('polygon')
+      .style('fill', (d, i) => i === this.selectedFace ? "#87023e" : "#e7e8e9");
+      const faceselection = this.faces.filter((face, i) => i === this.selectedFace)[0];
+      const selectedlinks = this.facelinks(faceselection,this.links);
+      const adjacentfaces = new Set()
+      for (let link of selectedlinks) {
+        const faces = this.linkfaces(link,this.faces);
+        for (let face of faces) {
+          adjacentfaces.add(face);
+        }         
+      }
+      adjacentfaces.delete(faceselection);
+      ref_holder.selectAll('polygon')
+      .style('fill', (d) => adjacentfaces.has(d) ? "#87023e" : "#e7e8e9");
+    }
+    }  
+  
+    mouseoverupperadjacent(holder,ref_holder) {
+      holder.selectAll(`polygon`)
+      .on('mouseover', (d, i) => {this.selectedFace = i;this.upperadjacentcells(holder,ref_holder,2)})
+      .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+      holder.selectAll("line.vis")
+      .on('mouseover', (d, i) => {this.selectedEdge = i;this.upperadjacentcells(holder,ref_holder,1)})
+      .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+      holder.selectAll('circle')
+        .on('mouseover', (d, i) => {this.selectedNode = i;this.upperadjacentcells(holder,ref_holder,0)})
+        .on('mouseout', () => this.unhighlightAll(holder,ref_holder));
+  
+    }
+    upperadjacentcells(holder,ref_holder, rank) {
+      if (rank <= 0) {
+        holder.selectAll('circle')
+      .style('fill', (d, i) => i === this.selectedNode ? "#c0dbe7" : "#e7e8e9");
+      const selectedNode = this.nodes.filter((node,i) => i === this.selectedNode)[0]
+      const selectedlinks = this.nodelinks(selectedNode,this.links);
+      const node_set = new Set();
+      for (let link of selectedlinks) {
+        node_set.add(link.a.i);
+        node_set.add(link.b.i);
+          }
+      node_set.delete(this.selectedNode);
+      ref_holder.selectAll('circle')
+      .style('fill', (d, i) => node_set.has(i) ? "#c0dbe7" : "#e7e8e9");
+  
+    }
+
+      if (rank == 1) {
+        // First select all the nodes. 
+        holder.selectAll('line.vis')
+        .style('stroke', (d, i) => i === this.selectedEdge ? "#c27e9e" : "#e7e8e9");
+        const edgeselection = this.links.filter((link, i) => i === this.selectedEdge)[0];
+        const selectedfaces = this.linkfaces(edgeselection,this.faces);
+        const finallinks = selectedfaces.map((face) => this.facelinks(face,this.links));
+        const link_set = new Set();
+        for (let link of finallinks) {
+          for (let elem of link) {
+            link_set.add(elem);
+          }
+            }
+        console.log(link_set);
+        ref_holder.selectAll('line.vis')
+        .style('stroke', (d, i) => link_set.has(d) && this.selectedEdge != i ? "#c27e9e" : "#e7e8e9");
+
+      }
+      if (rank == 2) {
+        return;
+      }
+      }
+  
+
   unhighlightAll(holder,ref_holder) {
     this.selectedEdge = -1;
     this.selectedNode = -1;
@@ -162,39 +353,30 @@ export class Table {
     ref_holder.selectAll('line.vis').style("stroke", "#e7e8e9");
     ref_holder.selectAll('polygon').style("fill", "#e7e8e9");
   }
+  facelinks(face,links)  {
+    // What links are connected to this face.
+    const faces = face;
+    const faceNodesSet = new Set();
+    faces.map((node) => {faceNodesSet.add(node.i)});
+    const filteredLinks = links.filter(link => faceNodesSet.has(link.a.i) && faceNodesSet.has(link.b.i));
+    // link_set = new Set(filteredLinks);
+    return filteredLinks}
+  linksnode(link,nodes) {
+      const links = link;
+      const filterednodes = nodes.filter(node => (node.i == links.a.i) || (node.i == links.b.i));
+      return filterednodes}
 
-  boundarycells(holder,ref_holder,select, rank) {
-    if (select == false) {
-      return;
+  linkfaces(link, faces) {
+        // What faces are connected to this face. 
+        const links = link;
+        const filteredfaces = faces.filter(face => {
+            const faceNodesSet = new Set(face.map(node => node.i)); // Declare faceNodesSet here
+            return faceNodesSet.has(links.a.i) && faceNodesSet.has(links.b.i);
+        });
+        return filteredfaces;
     }
-    if (rank <= 0) {
-      return;
-    }
-    if (rank == 1) {
-      holder.selectAll('line.vis')
-      .style('stroke', (d, i) => i === this.selectedEdge ? "#c27e9e" : "#e7e8e9");
-      const edgeselection = this.links.filter((link, i) => i === this.selectedEdge);
-      const uniqueNodes = new Set();
-      edgeselection.forEach(link => {
-        uniqueNodes.add(link.a.i);
-        uniqueNodes.add(link.b.i);
-      })
-      console.log(uniqueNodes);
-      const nodesArray = Array.from(uniqueNodes);
-      ref_holder.selectAll('circle')
-      .style('fill', (d, i) => nodesArray.includes(i) ? "#c0dbe7" : "#e7e8e9");
-    }
-    if (rank == 2) {
-      holder.selectAll('polygon')
-      .style('fill', (d, i) => i === this.selectedFace ? "#87023e" : "#e7e8e9");
-      let faceselection = this.faces.filter((link, i) => i === this.selectedFace)
-      .map(face => face.map(node => node.i));
-      const uniqueNodes = new Set();
-      uniqueNodes.add(...faceselection);
-      console.log({'nodes':uniqueNodes});
-
-    }
-
-    }
-    
+  nodelinks(node,links){
+      const nodes = node;
+      const filteredlinks = links.filter(link => (link.a.i == nodes.i) || (link.b.i == nodes.i));
+      return filteredlinks
   }
