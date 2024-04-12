@@ -26890,15 +26890,11 @@ var d3 = __importStar(require("d3"));
 var utils_1 = require("../utils");
 var Table = /** @class */function () {
   function Table() {
+    var _this = this;
     this.numNodes = 6;
     this.selectedNode = -1;
     this.selectedEdge = -1;
     this.selectedFace = -1;
-    this.data_dict = {
-      0: 'circle',
-      1: 'link',
-      2: 'faces'
-    };
     //create the required data.
     var _a = utils_1.makeGraph(this.numNodes, this.numNodes * 2),
       nodes = _a[0],
@@ -26941,42 +26937,55 @@ var Table = /** @class */function () {
     // Create the second row
     var secondRow = document.createElement('tr');
     secondRow.className = 'row-header';
-    // Create the boundary row
-    var boundaryRow = document.createElement('tr');
-    boundaryRow.className = 'boundary';
-    // Create the cells for the boundary row
-    var boundaryCell1 = document.createElement('td');
-    boundaryCell1.className = 'boundary-cell-one';
-    boundaryCell1.innerHTML = 'boundary-cell';
-    var boundaryCell2 = document.createElement('td');
-    boundaryCell2.className = 'boundary-cell-two'; // Give an ID to the cell for appending SVG
-    boundaryCell2.innerHTML = 'Hello who is this';
-    var boundaryCell3 = document.createElement('td');
-    boundaryCell3.className = 'boundary-cell'; // Give an ID to the cell for appending SVG
-    // Append boundary cells to boundary row
-    boundaryRow.appendChild(boundaryCell1);
-    boundaryRow.appendChild(boundaryCell2);
-    boundaryRow.appendChild(boundaryCell3);
-    // Append all rows to the table
+    var neighborhoodstructure = ["boundary", "co-boundary", "lower-adjacent", "upper-adjacent"];
+    var neighborhoodstructurehtml = ['Boundary<br><span style="font-size: smaller; font-style: italic;">All y-connected cells x cells of next lower rank</span>', 'Co-boundary<br><span style="font-size: smaller; font-style: italic;">All y-connected cells x cells of next higher rank</span>', 'Lower adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a boundary z with y</span>', 'Upper adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a co-boundary z with y</span>'];
     table.appendChild(headerRow);
     table.appendChild(secondRow);
-    table.appendChild(boundaryRow);
-    // Append the table to the div
+    for (var i = 0; i < neighborhoodstructure.length; i++) {
+      var boundaryRow = document.createElement('tr');
+      boundaryRow.className = neighborhoodstructure[i];
+      var boundaryCell1 = document.createElement('td');
+      boundaryCell1.className = neighborhoodstructure[i];
+      boundaryCell1.innerHTML = neighborhoodstructurehtml[i];
+      var boundaryCell2 = document.createElement('td');
+      boundaryCell2.className = neighborhoodstructure[i] + "one"; // Give an ID to the cell for appending SVG
+      boundaryCell2.innerHTML = 'Lorem Ipsum';
+      var boundaryCell3 = document.createElement('td');
+      boundaryCell3.className = neighborhoodstructure[i] + "two"; // Give an ID to the cell for appending SVG
+      // Append boundary cells to boundary row
+      boundaryRow.appendChild(boundaryCell1);
+      boundaryRow.appendChild(boundaryCell2);
+      boundaryRow.appendChild(boundaryCell3);
+      table.appendChild(boundaryRow);
+    }
     document.getElementById('table').appendChild(table);
-    // Create SVG elements and draw diagrams
-    var svg = d3.select("td.boundary-cell").append('svg').attr('width', 450).attr('height', 200);
-    var ex1 = svg.append('g');
-    var ex2 = svg.append('g');
-    var data = {
-      1: nodes,
-      2: links,
-      3: faces
-    };
-    this.drawDiagram(ex1, ex2, 30, 0, true);
-    this.drawDiagram(ex2, ex1, 250, 0, false);
+    // Define an array of classes for different table cells
+    var cellClasses = ["boundarytwo", "co-boundarytwo", "lower-adjacenttwo", "upper-adjacenttwo"];
+    // Loop through each cell class
+    cellClasses.forEach(function (cellClass) {
+      // Select the table cell and append an SVG element
+      var svg = d3.select("td." + cellClass).append('svg').attr('width', 450).attr('height', 200);
+      var ex1 = svg.append('g');
+      var ex2 = svg.append('g');
+      var arrow = svg.append('g');
+      _this.drawDiagram(ex1, 30, 0);
+      _this.drawDiagram(ex2, 250, 0);
+      arrow.append("line").attr("x1", 220).attr("y1", 110).attr("x2", 270).attr("y2", 110).style("stroke", "black").style("stroke-width", 1);
+      // Attach appropriate mouseover event handler based on the class
+      if (cellClass === "boundarytwo") {
+        _this.mouseoverboundary(ex1, ex2);
+      } else if (cellClass === "co-boundarytwo") {
+        _this.mouseovercoboundary(ex1, ex2);
+      } else if (cellClass === "lower-adjacenttwo") {
+        _this.mouseoverloweradjacent(ex1, ex2);
+      } else if (cellClass === "upper-adjacenttwo") {
+        _this.mouseoverupperadjacent(ex1, ex2);
+      }
+    });
+    // this.drawDiagram(ex1,ex2,30,0,true);
+    // this.drawDiagram(ex2,ex1,250,0,false);
   }
-  Table.prototype.drawDiagram = function (holder, ref_holder, x, y, select) {
-    var _this = this;
+  Table.prototype.drawDiagram = function (holder, x, y) {
     var localOffset = 0.6;
     var localScale = 150;
     var pos = function pos(x) {
@@ -26987,12 +26996,7 @@ var Table = /** @class */function () {
         return pos(node.x) + x + "," + (pos(node.y) + y);
       }).join(' ');
       return points;
-    }).attr('fill', '#e7e8e9').attr('stroke', 'transparent').attr('stroke-width', 2).classed("{selected}", true).on('mouseover', function (d, i) {
-      _this.selectedFace = i;
-      _this.boundarycells(holder, ref_holder, select, 2);
-    }).on('mouseout', function () {
-      return _this.unhighlightAll(holder, ref_holder);
-    });
+    }).attr('fill', '#e7e8e9').attr('stroke', 'transparent').attr('stroke-width', 2);
     holder.selectAll('line.vis').data(this.links).enter().append('line').classed('vis', true).style("stroke", "#e7e8e9").style("stroke-width", 5).attr("x1", function (d) {
       return pos(d.a.x) + x;
     }).attr("x2", function (d) {
@@ -27001,22 +27005,258 @@ var Table = /** @class */function () {
       return pos(d.a.y) + y;
     }).attr("y2", function (d) {
       return pos(d.b.y) + y;
-    }).on('mouseover', function (d, i) {
-      _this.selectedEdge = i;
-      _this.boundarycells(holder, ref_holder, select, 1);
-    }).on('mouseout', function () {
-      return _this.unhighlightAll(holder, ref_holder);
     });
     holder.selectAll('circle').data(this.nodes).enter().append('circle').attr('r', 10).attr('cx', function (d) {
       return pos(d.x) + x;
     }).attr('cy', function (d) {
       return pos(d.y) + y;
-    }).style('fill', '#e7e8e9').style("stroke-width", '1px').style("stroke", '#bbb').on('mouseover', function (d, i) {
-      _this.selectedNode = i;
-      _this.boundarycells(holder, ref_holder, select, 0);
+    }).style('fill', '#e7e8e9').style("stroke-width", '1px').style("stroke", '#bbb');
+  };
+  Table.prototype.mouseoverboundary = function (holder, ref_holder) {
+    var _this = this;
+    holder.selectAll("polygon").on('mouseover', function (d, i) {
+      _this.selectedFace = i;
+      _this.boundarycells(holder, ref_holder, 2);
     }).on('mouseout', function () {
       return _this.unhighlightAll(holder, ref_holder);
     });
+    holder.selectAll("line.vis").on('mouseover', function (d, i) {
+      _this.selectedEdge = i;
+      _this.boundarycells(holder, ref_holder, 1);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll('circle').on('mouseover', function (d, i) {
+      _this.selectedNode = i;
+      _this.boundarycells(holder, ref_holder, 0);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+  };
+  Table.prototype.boundarycells = function (holder, ref_holder, rank) {
+    var _this = this;
+    if (rank <= 0) {
+      return;
+    }
+    if (rank == 1) {
+      holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return i === _this.selectedEdge ? "#c27e9e" : "#e7e8e9";
+      });
+      var edgeselection = this.links.filter(function (link, i) {
+        return i === _this.selectedEdge;
+      })[0];
+      var selectednodes_1 = this.linksnode(edgeselection, this.nodes).map(function (node) {
+        return node.i;
+      });
+      ref_holder.selectAll('circle').style('fill', function (d, i) {
+        return selectednodes_1.includes(i) ? "#c0dbe7" : "#e7e8e9";
+      });
+    }
+    if (rank == 2) {
+      holder.selectAll('polygon').style('fill', function (d, i) {
+        return i === _this.selectedFace ? "#87023e" : "#e7e8e9";
+      });
+      var faceselection = this.faces.filter(function (face, i) {
+        return i === _this.selectedFace;
+      })[0];
+      //Now these are multiple, so how do we check?
+      var selectedlinks_1 = this.facelinks(faceselection, this.links);
+      ref_holder.selectAll('line.vis').style("stroke", function (d, i) {
+        return selectedlinks_1.includes(d) ? "#c27e9e" : "#e7e8e9";
+      });
+    }
+  };
+  Table.prototype.mouseovercoboundary = function (holder, ref_holder) {
+    var _this = this;
+    holder.selectAll("polygon").on('mouseover', function (d, i) {
+      _this.selectedFace = i;
+      _this.coboundarycells(holder, ref_holder, 2);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll("line.vis").on('mouseover', function (d, i) {
+      _this.selectedEdge = i;
+      _this.coboundarycells(holder, ref_holder, 1);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll('circle').on('mouseover', function (d, i) {
+      _this.selectedNode = i;
+      _this.coboundarycells(holder, ref_holder, 0);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+  };
+  Table.prototype.coboundarycells = function (holder, ref_holder, rank) {
+    var _this = this;
+    if (rank >= 2) {
+      return;
+    }
+    if (rank == 1) {
+      holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return i === _this.selectedEdge ? "#c27e9e" : "#e7e8e9";
+      });
+      var edgeselection = this.links.filter(function (link, i) {
+        return i === _this.selectedEdge;
+      })[0];
+      var selectedfaces_1 = this.linkfaces(edgeselection, this.faces);
+      var faceindices_1 = this.faces.map(function (face, i) {
+        return selectedfaces_1.includes(face) ? i : -1;
+      }).filter(function (index) {
+        return index !== -1;
+      });
+      ref_holder.selectAll('polygon').style('fill', function (d, i) {
+        return faceindices_1.includes(i) ? "#87023e" : "#e7e8e9";
+      });
+    }
+    if (rank == 0) {
+      holder.selectAll('circle').style('fill', function (d, i) {
+        return i === _this.selectedNode ? "#c0dbe7" : "#e7e8e9";
+      });
+      var selectedIndices_1 = this.links.map(function (link, i) {
+        return link.a.i === _this.selectedNode || link.b.i === _this.selectedNode ? i : -1;
+      }).filter(function (index) {
+        return index !== -1;
+      });
+      ref_holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return selectedIndices_1.includes(i) ? "#c27e9e" : "#e7e8e9";
+      });
+    }
+  };
+  Table.prototype.mouseoverloweradjacent = function (holder, ref_holder) {
+    var _this = this;
+    holder.selectAll("polygon").on('mouseover', function (d, i) {
+      _this.selectedFace = i;
+      _this.loweradjacentcells(holder, ref_holder, 2);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll("line.vis").on('mouseover', function (d, i) {
+      _this.selectedEdge = i;
+      _this.loweradjacentcells(holder, ref_holder, 1);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll('circle').on('mouseover', function (d, i) {
+      _this.selectedNode = i;
+      _this.loweradjacentcells(holder, ref_holder, 0);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+  };
+  Table.prototype.loweradjacentcells = function (holder, ref_holder, rank) {
+    var _this = this;
+    if (rank <= 0) {
+      return;
+    }
+    if (rank == 1) {
+      // First select all the nodes. 
+      holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return i === _this.selectedEdge ? "#c27e9e" : "#e7e8e9";
+      });
+      var edgeselection = this.links.filter(function (link, i) {
+        return i === _this.selectedEdge;
+      })[0];
+      var selectednodes_2 = this.linksnode(edgeselection, this.nodes).map(function (node) {
+        return node.i;
+      });
+      ref_holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return (selectednodes_2.includes(d.a.i) || selectednodes_2.includes(d.b.i)) & !(i === _this.selectedEdge) ? "#c27e9e" : "#e7e8e9";
+      });
+    }
+    if (rank == 2) {
+      holder.selectAll('polygon').style('fill', function (d, i) {
+        return i === _this.selectedFace ? "#87023e" : "#e7e8e9";
+      });
+      var faceselection = this.faces.filter(function (face, i) {
+        return i === _this.selectedFace;
+      })[0];
+      var selectedlinks = this.facelinks(faceselection, this.links);
+      var adjacentfaces_1 = new Set();
+      for (var _i = 0, selectedlinks_2 = selectedlinks; _i < selectedlinks_2.length; _i++) {
+        var link = selectedlinks_2[_i];
+        var faces = this.linkfaces(link, this.faces);
+        for (var _a = 0, faces_1 = faces; _a < faces_1.length; _a++) {
+          var face = faces_1[_a];
+          adjacentfaces_1.add(face);
+        }
+      }
+      adjacentfaces_1.delete(faceselection);
+      ref_holder.selectAll('polygon').style('fill', function (d) {
+        return adjacentfaces_1.has(d) ? "#87023e" : "#e7e8e9";
+      });
+    }
+  };
+  Table.prototype.mouseoverupperadjacent = function (holder, ref_holder) {
+    var _this = this;
+    holder.selectAll("polygon").on('mouseover', function (d, i) {
+      _this.selectedFace = i;
+      _this.upperadjacentcells(holder, ref_holder, 2);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll("line.vis").on('mouseover', function (d, i) {
+      _this.selectedEdge = i;
+      _this.upperadjacentcells(holder, ref_holder, 1);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+    holder.selectAll('circle').on('mouseover', function (d, i) {
+      _this.selectedNode = i;
+      _this.upperadjacentcells(holder, ref_holder, 0);
+    }).on('mouseout', function () {
+      return _this.unhighlightAll(holder, ref_holder);
+    });
+  };
+  Table.prototype.upperadjacentcells = function (holder, ref_holder, rank) {
+    var _this = this;
+    if (rank <= 0) {
+      holder.selectAll('circle').style('fill', function (d, i) {
+        return i === _this.selectedNode ? "#c0dbe7" : "#e7e8e9";
+      });
+      var selectedNode = this.nodes.filter(function (node, i) {
+        return i === _this.selectedNode;
+      })[0];
+      var selectedlinks = this.nodelinks(selectedNode, this.links);
+      var node_set_1 = new Set();
+      for (var _i = 0, selectedlinks_3 = selectedlinks; _i < selectedlinks_3.length; _i++) {
+        var link = selectedlinks_3[_i];
+        node_set_1.add(link.a.i);
+        node_set_1.add(link.b.i);
+      }
+      node_set_1.delete(this.selectedNode);
+      ref_holder.selectAll('circle').style('fill', function (d, i) {
+        return node_set_1.has(i) ? "#c0dbe7" : "#e7e8e9";
+      });
+    }
+    if (rank == 1) {
+      // First select all the nodes. 
+      holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return i === _this.selectedEdge ? "#c27e9e" : "#e7e8e9";
+      });
+      var edgeselection = this.links.filter(function (link, i) {
+        return i === _this.selectedEdge;
+      })[0];
+      var selectedfaces = this.linkfaces(edgeselection, this.faces);
+      var finallinks = selectedfaces.map(function (face) {
+        return _this.facelinks(face, _this.links);
+      });
+      var link_set_1 = new Set();
+      for (var _a = 0, finallinks_1 = finallinks; _a < finallinks_1.length; _a++) {
+        var link = finallinks_1[_a];
+        for (var _b = 0, link_1 = link; _b < link_1.length; _b++) {
+          var elem = link_1[_b];
+          link_set_1.add(elem);
+        }
+      }
+      console.log(link_set_1);
+      ref_holder.selectAll('line.vis').style('stroke', function (d, i) {
+        return link_set_1.has(d) && _this.selectedEdge != i ? "#c27e9e" : "#e7e8e9";
+      });
+    }
+    if (rank == 2) {
+      return;
+    }
   };
   Table.prototype.unhighlightAll = function (holder, ref_holder) {
     this.selectedEdge = -1;
@@ -27029,49 +27269,43 @@ var Table = /** @class */function () {
     ref_holder.selectAll('line.vis').style("stroke", "#e7e8e9");
     ref_holder.selectAll('polygon').style("fill", "#e7e8e9");
   };
-  Table.prototype.boundarycells = function (holder, ref_holder, select, rank) {
-    var _this = this;
-    if (select == false) {
-      return;
-    }
-    if (rank <= 0) {
-      return;
-    }
-    if (rank == 1) {
-      holder.selectAll('line.vis').style('stroke', function (d, i) {
-        return i === _this.selectedEdge ? "#c27e9e" : "#e7e8e9";
-      });
-      var edgeselection = this.links.filter(function (link, i) {
-        return i === _this.selectedEdge;
-      });
-      var uniqueNodes_1 = new Set();
-      edgeselection.forEach(function (link) {
-        uniqueNodes_1.add(link.a.i);
-        uniqueNodes_1.add(link.b.i);
-      });
-      console.log(uniqueNodes_1);
-      var nodesArray_1 = Array.from(uniqueNodes_1);
-      ref_holder.selectAll('circle').style('fill', function (d, i) {
-        return nodesArray_1.includes(i) ? "#c0dbe7" : "#e7e8e9";
-      });
-    }
-    if (rank == 2) {
-      holder.selectAll('polygon').style('fill', function (d, i) {
-        return i === _this.selectedFace ? "#87023e" : "#e7e8e9";
-      });
-      var faceselection = this.faces.filter(function (link, i) {
-        return i === _this.selectedFace;
-      }).map(function (face) {
-        return face.map(function (node) {
-          return node.i;
-        });
-      });
-      var uniqueNodes = new Set();
-      uniqueNodes.add.apply(uniqueNodes, faceselection);
-      console.log({
-        'nodes': uniqueNodes
-      });
-    }
+  Table.prototype.facelinks = function (face, links) {
+    // What links are connected to this face.
+    var faces = face;
+    var faceNodesSet = new Set();
+    faces.map(function (node) {
+      faceNodesSet.add(node.i);
+    });
+    var filteredLinks = links.filter(function (link) {
+      return faceNodesSet.has(link.a.i) && faceNodesSet.has(link.b.i);
+    });
+    // link_set = new Set(filteredLinks);
+    return filteredLinks;
+  };
+  Table.prototype.linksnode = function (link, nodes) {
+    var links = link;
+    var filterednodes = nodes.filter(function (node) {
+      return node.i == links.a.i || node.i == links.b.i;
+    });
+    return filterednodes;
+  };
+  Table.prototype.linkfaces = function (link, faces) {
+    // What faces are connected to this face. 
+    var links = link;
+    var filteredfaces = faces.filter(function (face) {
+      var faceNodesSet = new Set(face.map(function (node) {
+        return node.i;
+      })); // Declare faceNodesSet here
+      return faceNodesSet.has(links.a.i) && faceNodesSet.has(links.b.i);
+    });
+    return filteredfaces;
+  };
+  Table.prototype.nodelinks = function (node, links) {
+    var nodes = node;
+    var filteredlinks = links.filter(function (link) {
+      return link.a.i == nodes.i || link.b.i == nodes.i;
+    });
+    return filteredlinks;
   };
   return Table;
 }();
