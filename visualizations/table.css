@@ -13,10 +13,13 @@
 .neighborhood-structure {
     border: 1px solid #ddd;
   }
-  .cell-complex,
-  .examples {
+.cell-complex,
+.examples {
     border: 1px solid #ddd;
     text-align: center;
+  }
+td {
+    border: 1px solid #ddd;
   }
   /* .boundary {
     height: 200px;

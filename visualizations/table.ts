@@ -82,7 +82,7 @@ export class Table {
       boundaryCell1.innerHTML = neighborhoodstructurehtml[i];
       const boundaryCell2 = document.createElement('td');
       boundaryCell2.className = `${neighborhoodstructure[i]}one`; // Give an ID to the cell for appending SVG
-      boundaryCell2.innerHTML = 'Lorem Ipsum';
+      // boundaryCell2.innerHTML = 'Lorem Ipsum';
       const boundaryCell3 = document.createElement('td');
       boundaryCell3.className = `${neighborhoodstructure[i]}two`; // Give an ID to the cell for appending SVG
       // Append boundary cells to boundary row
@@ -94,28 +94,61 @@ export class Table {
 
     }
     document.getElementById('table').appendChild(table);
+    for (let i = 0; i < neighborhoodstructure.length; i++) {
+    const boundary1Cell = document.querySelector(`td.${neighborhoodstructure[i]}one`);
+    const imgElement = document.createElement('img');
+    if (i == 2 || i == 3 ) {
+      const imgElementone = document.createElement('img');
+      imgElementone.src =  `imgs/${neighborhoodstructure[i]}-one.png`; // Set the source path of your image
+      imgElementone.style.width = '115%'
+      imgElementone.style.height = '130%';
+      imgElementone.style.marginLeft = '-7px'
+      
+      boundary1Cell.appendChild(imgElementone)
+      imgElement.src =  `imgs/${neighborhoodstructure[i]}-two.png`; // Set the source path of your image
+      imgElement.style.width = '115%'
+      imgElement.style.height = '130%';
+      imgElement.style.marginLeft = '-7px'
+      imgElement.style.borderTop = '1px solid #ddd';
+      boundary1Cell.appendChild(imgElement)}
+    
+    else {
+    imgElement.src =  `imgs/${neighborhoodstructure[i]}.png`; // Set the source path of your image
+    imgElement.style.width = '115%'
+    imgElement.style.height = '130%';
+    imgElement.style.marginLeft = '-7px'
+    imgElement.style.zIndex = '-1';
+    boundary1Cell.appendChild(imgElement)}}
+
     // Define an array of classes for different table cells
     const cellClasses = ["boundarytwo", "co-boundarytwo", "lower-adjacenttwo", "upper-adjacenttwo"];
-
     // Loop through each cell class
     cellClasses.forEach(cellClass => {
         // Select the table cell and append an SVG element
         let svg = d3.select(`td.${cellClass}`).append('svg').attr('width', 450).attr('height', 200);
         const ex1 = svg.append('g');
         const ex2 = svg.append('g');
-        const arrow = svg.append('g')
-        
+        const arrow = svg.append('g');      
         this.drawDiagram(ex1, 30, 0);
         this.drawDiagram(ex2, 250, 0);
+        arrow.append("defs")
+        .append("marker")
+        .attr("id", "triangle")
+        .attr("viewBox", "0 0 10 10") // Adjusted viewBox for better visibility
+        .attr("refX", 5) // Adjusted refX to center the marker
+        .attr("refY", 5) // Adjusted refY to center the marker
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M 0 0 L 10 5 L 0 10 z");
         arrow.append("line")
         .attr("x1", 220)
-        .attr("y1", 110)
-        .attr("x2", 270)
-        .attr("y2", 110)
-        .style("stroke", "black")
-        .style("stroke-width", 1)
-
-
+        .attr("y1", 112.5)
+        .attr("x2", 260)
+        .attr("y2", 112.5)
+        .attr("stroke", "black")
+        .attr("marker-end", "url(#triangle)");
         // Attach appropriate mouseover event handler based on the class
         if (cellClass === "boundarytwo") {
             this.mouseoverboundary(ex1, ex2);
