@@ -27410,10 +27410,10 @@ var GraphDescription = /** @class */function () {
       return (x + localOffset) * localScale;
     };
     var selectedFaceIdx = -1;
-    var graphHolder = this.svg.append('g');
-    var simplicialHolder = this.svg.append('g');
-    var cellHolder = this.svg.append('g');
-    var hyperHolder = this.svg.append('g');
+    var graphHolder = this.svg.append('g').classed('graph-holder', true);
+    var simplicialHolder = this.svg.append('g').classed('simplicial-holder', true);
+    var cellHolder = this.svg.append('g').classed('cell-holder', true);
+    var hyperHolder = this.svg.append('g').classed('hyper-holder', true);
     var holders = [graphHolder, simplicialHolder, cellHolder, hyperHolder];
     var textElems = ["Graph Neural Network", "Simipicial Cell Complex", "Cell Complex", "Combinatorial Complex"];
     var positions = [[5, 2], [300, 2], [605, 2], [905, 2]];
@@ -27426,17 +27426,13 @@ var GraphDescription = /** @class */function () {
       if (holder == hyperHolder) {
         return "continue";
       }
-      // (d, i) => this.highlightFaces(holder)}
-      // (d, i) => {this.selectedFaceIdx = i;this.highlightFaces(holder)}
       if (holder == simplicialHolder) {
         holder.selectAll('polygon').data(SimplicialcomplexFaces).enter().append('polygon').attr('points', function (d) {
           var points = d.map(function (node) {
             return pos(node.x) + positions[index][0] + "," + pos(node.y);
           }).join(' ');
           return points;
-        }).attr('fill', 'transparent').attr('stroke', 'transparent').attr('stroke-width', 2)
-        // .attr('stroke-dasharray', '5,5')
-        .on('mouseover', function (d, i) {
+        }).attr('fill', 'transparent').attr('stroke', 'transparent').attr('stroke-width', 2).on('mouseover', function (d, i) {
           _this.selectedFaceIdx = i;
           _this.highlightFaces(holder);
         }).on('mouseout', function () {
@@ -27456,7 +27452,15 @@ var GraphDescription = /** @class */function () {
           return _this.unhighlightAll();
         });
       }
-      holder.selectAll('line.vis').data(links).enter().append('line').classed('vis', true).style("stroke", "#f7a3f6").style("stroke-width", 1).attr("x1", function (d) {
+      // let links = links.slice(0, -1);
+      if (holder == cellHolder) {
+        var selected_links = links.slice(1);
+        selected_links.splice(11, 1);
+        selected_links.splice(11, 1);
+      } else {
+        var selected_links = links.slice(1);
+      }
+      holder.selectAll('line.vis').data(selected_links).enter().append('line').classed('vis', true).style("stroke", "#bbb").style("stroke-width", 1).attr("x1", function (d) {
         return pos(d.a.x) + positions[index][0];
       }).attr("x2", function (d) {
         return pos(d.b.x) + positions[index][0];
@@ -27465,7 +27469,7 @@ var GraphDescription = /** @class */function () {
       }).attr("y2", function (d) {
         return pos(d.b.y);
       });
-      holder.selectAll('line.target').data(links).enter().append('line').classed('target', true).style("stroke", "rgba(0, 0, 0, 0)").style("stroke-width", 10).attr("x1", function (d) {
+      holder.selectAll('line.target').data(selected_links).enter().append('line').classed('target', true).style("stroke", "rgba(0, 0, 0, 0)").style("stroke-width", 10).attr("x1", function (d) {
         return pos(d.a.x) + positions[index][0];
       }).attr("x2", function (d) {
         return pos(d.b.x) + positions[index][0];
@@ -27478,7 +27482,7 @@ var GraphDescription = /** @class */function () {
       }).on('mouseout', function () {
         return _this.unhighlightAll();
       });
-      holder.selectAll('line.vis').data(links).enter().append('line').classed('vis', true).style("stroke", "#bbb").style("stroke-width", 1).attr("x1", function (d) {
+      holder.selectAll('line.vis').data(selected_links).enter().append('line').classed('vis', true).style("stroke", "#bbb").style("stroke-width", 1).attr("x1", function (d) {
         return pos(d.a.x) + positions[index][0];
       }).attr("x2", function (d) {
         return pos(d.b.x) + positions[index][0];
@@ -27491,7 +27495,7 @@ var GraphDescription = /** @class */function () {
         return pos(d.x) + positions[index][0];
       }).attr('cy', function (d) {
         return pos(d.y);
-      }).style('fill', '#ffa339').style("stroke-width", '1px').style("stroke", '#bbb').on('mouseover', function () {
+      }).style('fill', "#c0dbe7").style("stroke-width", '1px').style("stroke", '#bbb').on('mouseover', function () {
         return _this.highlightNodes(holder);
       }).on('mouseout', function () {
         return _this.unhighlightAll();
@@ -27500,31 +27504,30 @@ var GraphDescription = /** @class */function () {
     for (var index = 0; index < positions.length; index++) {
       _loop_1(index);
     }
-    // Cell Complex is different from the others. 
-    hyperHolder.selectAll('rect.face_one').data([nodes[4], nodes[1]]).enter().append('rect.face_one').attr("x", pos(nodes[2].x) - 30 + positions[3][0]).attr("y", pos(nodes[2].y) - 35).attr("width", 180).attr("height", 200).attr("rx", 30) // Set the x-axis radius for rounded corners
+    var hyper_holder_data = {
+      'face_one': [1, 2, 3, 4],
+      'face_two': [2, 3],
+      'face_three': [0, 1, 4],
+      'face_four': [5, 1],
+      'path': [0, 1, 4]
+    };
+    console.log(hyper_holder_data['face_one']);
+    var dataEntries = d3.entries(hyper_holder_data);
+    hyperHolder.selectAll('rect.face_one').data(dataEntries).enter().append('rect.face_one').attr("x", pos(nodes[2].x) - 30 + positions[3][0]).attr("y", pos(nodes[2].y) - 35).attr("width", 180).attr("height", 200).attr("rx", 30) // Set the x-axis radius for rounded corners
     .attr("ry", 30) // Set the y-axis radius for rounded corners
-    .style("fill", '#acbef6').style("fill-opacity", 0.5).on('mouseover', function () {
+    .attr("fill", "#87023e").attr("stroke", "white").on('mouseover', function () {
       return _this.highlightHyperEdge(hyperHolder, "face_one");
     }).on('mouseout', function () {
       return _this.unhighlightAll();
     });
     hyperHolder.append('rect.face_two').attr("x", pos(nodes[2].x) - 25 + positions[3][0]).attr("y", pos(nodes[2].y) - 20).attr("width", 50).attr("height", 180).attr("rx", 30) // Set the x-axis radius for rounded corners
     .attr("ry", 30) // Set the y-axis radius for rounded corners
-    .style("fill", "#f7a3f6").style("fill-opacity", 0.5).on('mouseover', function () {
+    .attr("fill", "#c27e9e").attr("stroke", "white").on('mouseover', function () {
       return _this.highlightHyperEdge(hyperHolder, "face_two");
     }).on('mouseout', function () {
       return _this.unhighlightAll();
     });
-    hyperHolder.append('rect.face_three').attr("x", pos(nodes[2].x) - 25 + positions[3][0]).attr("y", pos(nodes[2].y) - 25).attr("width", 170).attr("height", 50).attr("rx", 30) // Set the x-axis radius for rounded corners
-    .attr("ry", 30) // Set the y-axis radius for rounded corners
-    .style("fill", "#f7a3f6").style("fill-opacity", 0.5).on('mouseover', function () {
-      return _this.highlightHyperEdge(hyperHolder, "face_three");
-    }).on('mouseout', function () {
-      return _this.unhighlightAll();
-    });
-    hyperHolder.append('rect.face_four').attr("x", pos(nodes[1].x) - 25 + positions[3][0]).attr("y", pos(nodes[1].y) - 25).attr("width", 123).attr("height", 50).attr("rx", 30) // Set the x-axis radius for rounded corners
-    .attr("ry", 30) // Set the y-axis radius for rounded corners
-    .attr("transform", "rotate(-45 " + (pos(nodes[1].x) + positions[3][0]) + " " + pos(nodes[1].y) + ")").style("fill", "#f7a3f6").style("fill-opacity", 0.5).on('mouseover', function () {
+    hyperHolder.append('rect.face_four').attr("x", pos(nodes[1].x) - 25 + positions[3][0]).attr("y", pos(nodes[1].y) - 25).attr("width", 123).attr("height", 50).attr("rx", 30).attr("ry", 30).attr("transform", "rotate(-45 " + (pos(nodes[1].x) + positions[3][0]) + " " + pos(nodes[1].y) + ")").attr("fill", "#87023e").attr("stroke", "white").on('mouseover', function () {
       return _this.highlightHyperEdge(hyperHolder, "face_four");
     }).on('mouseout', function () {
       return _this.unhighlightAll();
@@ -27540,18 +27543,16 @@ var GraphDescription = /** @class */function () {
       y: pos(nodes[1].y) - 35
     }];
     var path = this.roundedPolygon(p, 25);
-    // console.log(path);
-    hyperHolder.append('path').attr('d', path).style('fill', '#acbef6').style("fill-opacity", 0.5).on('mouseover', function () {
+    hyperHolder.append('path').attr('d', path).attr('fill', "#c27e9e").attr("stroke", "white").on('mouseover', function () {
       return _this.highlightHyperEdge(hyperHolder, "path");
     }).on('mouseout', function () {
       return _this.unhighlightAll();
     });
-    ;
     hyperHolder.selectAll('circle').data(nodes).enter().append('circle').attr('r', 10).attr('cx', function (d) {
       return pos(d.x) + positions[3][0];
     }).attr('cy', function (d) {
       return pos(d.y);
-    }).style('fill', '#ffa339').on('mouseover', function () {
+    }).attr('fill', "#c0dbe7").on('mouseover', function () {
       return _this.highlightNodes(hyperHolder);
     }).on('mouseout', function () {
       return _this.unhighlightAll();
@@ -27559,25 +27560,26 @@ var GraphDescription = /** @class */function () {
   };
   GraphDescription.prototype.highlightEdges = function (holder) {
     // this.parent.select('#E').classed('selected', true);
-    holder.selectAll('line.vis').style("stroke", "#f7a3f6").style("stroke-width", 5);
+    holder.selectAll('line.vis').style("stroke", "#c27e9e").style("stroke-width", 5);
   };
   GraphDescription.prototype.highlightHyperEdge = function (holder, rect_property) {
-    var data = holder.selectAll('circle').data();
-    // Create circles based on the selected data
-    holder.selectAll('circle').data(data) // Bind data to circles
-    .enter() // Enter selection for new data
-    .append('circle') // Append circle for each data point
-    .attr('cx', function (d) {
-      return pos(d.x) + positions[3][0];
-    }) // Set x-coordinate based on data
-    .attr('cy', function (d) {
-      return pos(d.y);
-    }) // Set y-coordinate based on data
-    .attr('r', 15) // Set radius
-    .style('fill', 'red'); // Set fill color
-    holder.selectAll("rect." + rect_property).attr("fill", "black").attr("stroke", "black").attr("stroke-width", 2);
+    var data = holder.selectAll('rect.face_one').data();
+    var dict_values = {
+      'face_one': 0,
+      'face_two': 1,
+      'face_three': 2,
+      'face_four': 3,
+      'path': 4
+    };
+    var select_index = data[dict_values[rect_property]].value;
+    holder.selectAll('circle').attr("stroke", function (d, i) {
+      return select_index.includes(i) ? "black" : "#c0dbe7";
+    }).attr("stroke-width", function (d, i) {
+      return select_index.includes(i) ? 5 : 2;
+    });
+    holder.selectAll("rect." + rect_property).attr("stroke", "white").attr("stroke-width", 2);
     if (rect_property == "path") {
-      holder.selectAll('path').attr("fill", "black").attr("stroke", "black").attr("stroke-width", 2);
+      holder.selectAll('path').attr("stroke", "white").attr("stroke-width", 2);
     }
   };
   GraphDescription.prototype.highlightFaces = function (holder) {
@@ -27586,13 +27588,13 @@ var GraphDescription = /** @class */function () {
     holder.selectAll('polygon').attr("fill", function (d, i) {
       if (_this.selectedFaceIdx == i) {
         selectedPolygonData = d; // Store the data where selectedFaceIdx == i
-        return '#acbef6';
+        return '#87023e';
       } else {
         return "transparent";
       }
     }).attr("stroke", function (d, i) {
       if (_this.selectedFaceIdx == i) {
-        return "#f7a3f6";
+        return "#c27e9e";
       } else {
         return "transparent";
       }
@@ -27648,11 +27650,9 @@ var GraphDescription = /** @class */function () {
     return path;
   };
   GraphDescription.prototype.highlightNodes = function (holder) {
-    // this.parent.select('#V').classed('selected', true);
-    holder.selectAll('circle').style("stroke-width", 2).style("stroke", '#000').attr("r", 11);
+    holder.selectAll('circle').attr("stroke-width", 2).attr("stroke", '#000').attr("r", 11);
   };
   GraphDescription.prototype.highlightGlobal = function () {
-    // this.parent.select('#U').classed('selected', true);
     this.parent.selectAll('rect').style("stroke", '#000').style("stroke-width", 8);
   };
   GraphDescription.prototype.unhighlightAll = function () {
@@ -27660,11 +27660,7 @@ var GraphDescription = /** @class */function () {
     this.parent.selectAll('line.vis').style("stroke", "#bbb").style("stroke-width", '1px');
     this.parent.selectAll('polygon').attr("fill", "transparent").attr("stroke-width", '1px').attr("stroke", "#bbb");
     // .style("stroke","transparent");
-    this.parent.selectAll('circle').style("stroke-width", '1px').style("stroke", '#aaa').attr("r", 10);
-    // this.parent.selectAll('rect')
-    //   .style("stroke-width", 2)
-    //   .style("stroke")
-    //   .style("stroke", '#ddd')
+    this.parent.selectAll('circle').attr("stroke-width", '1px').attr("stroke", '#aaa').attr("r", 10);
     this.parent.selectAll('rect').attr("stroke-width", 1).attr("stroke", '#ddd');
     this.parent.selectAll('path').attr("stroke-width", 1).attr("stroke", '#ddd');
   };
