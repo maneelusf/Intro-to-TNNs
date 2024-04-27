@@ -27460,7 +27460,7 @@ var GraphDescription = /** @class */function () {
       } else {
         var selected_links = links.slice(1);
       }
-      holder.selectAll('line.vis').data(selected_links).enter().append('line').classed('vis', true).style("stroke", "#bbb").style("stroke-width", 1).attr("x1", function (d) {
+      holder.selectAll('line.vis').data(selected_links).enter().append('line').classed('vis', true).attr("stroke", "#bbb").attr("stroke-width", 1).attr("x1", function (d) {
         return pos(d.a.x) + positions[index][0];
       }).attr("x2", function (d) {
         return pos(d.b.x) + positions[index][0];
@@ -27469,7 +27469,7 @@ var GraphDescription = /** @class */function () {
       }).attr("y2", function (d) {
         return pos(d.b.y);
       });
-      holder.selectAll('line.target').data(selected_links).enter().append('line').classed('target', true).style("stroke", "rgba(0, 0, 0, 0)").style("stroke-width", 10).attr("x1", function (d) {
+      holder.selectAll('line.target').data(selected_links).enter().append('line').classed('target', true).attr("stroke", "rgba(0, 0, 0, 0)").attr("stroke-width", 10).attr("x1", function (d) {
         return pos(d.a.x) + positions[index][0];
       }).attr("x2", function (d) {
         return pos(d.b.x) + positions[index][0];
@@ -27482,7 +27482,7 @@ var GraphDescription = /** @class */function () {
       }).on('mouseout', function () {
         return _this.unhighlightAll();
       });
-      holder.selectAll('line.vis').data(selected_links).enter().append('line').classed('vis', true).style("stroke", "#bbb").style("stroke-width", 1).attr("x1", function (d) {
+      holder.selectAll('line.vis').data(selected_links).enter().append('line').classed('vis', true).attr("stroke", "#bbb").attr("stroke-width", 1).attr("x1", function (d) {
         return pos(d.a.x) + positions[index][0];
       }).attr("x2", function (d) {
         return pos(d.b.x) + positions[index][0];
@@ -27495,7 +27495,7 @@ var GraphDescription = /** @class */function () {
         return pos(d.x) + positions[index][0];
       }).attr('cy', function (d) {
         return pos(d.y);
-      }).style('fill', "#c0dbe7").style("stroke-width", '1px').style("stroke", '#bbb').on('mouseover', function () {
+      }).attr('fill', "#c0dbe7").attr("stroke-width", '1px').attr("stroke", '#bbb').on('mouseover', function () {
         return _this.highlightNodes(holder);
       }).on('mouseout', function () {
         return _this.unhighlightAll();
@@ -27560,7 +27560,7 @@ var GraphDescription = /** @class */function () {
   };
   GraphDescription.prototype.highlightEdges = function (holder) {
     // this.parent.select('#E').classed('selected', true);
-    holder.selectAll('line.vis').style("stroke", "#c27e9e").style("stroke-width", 5);
+    holder.selectAll('line.vis').attr("stroke", "#c27e9e").attr("stroke-width", 5);
   };
   GraphDescription.prototype.highlightHyperEdge = function (holder, rect_property) {
     var data = holder.selectAll('rect.face_one').data();
@@ -27609,13 +27609,13 @@ var GraphDescription = /** @class */function () {
     for (var j = 0; j < selectedPolygonData.length; j++) {
       selectednodes.add(selectedPolygonData[j].i);
     }
-    holder.selectAll('circle').style("stroke-width", function (d) {
+    holder.selectAll('circle').attr("stroke-width", function (d) {
       if (selectednodes.has(d.i)) {
         return 5;
       } else {
         return 2;
       }
-    }).style("stroke", function (d) {
+    }).attr("stroke", function (d) {
       if (selectednodes.has(d.i)) {
         return "#000";
       } else {
@@ -27657,9 +27657,8 @@ var GraphDescription = /** @class */function () {
   };
   GraphDescription.prototype.unhighlightAll = function () {
     this.selectedFaceIdx = -1;
-    this.parent.selectAll('line.vis').style("stroke", "#bbb").style("stroke-width", '1px');
+    this.parent.selectAll('line.vis').attr("stroke", "#bbb").attr("stroke-width", '1px');
     this.parent.selectAll('polygon').attr("fill", "transparent").attr("stroke-width", '1px').attr("stroke", "#bbb");
-    // .style("stroke","transparent");
     this.parent.selectAll('circle').attr("stroke-width", '1px').attr("stroke", '#aaa').attr("r", 10);
     this.parent.selectAll('rect').attr("stroke-width", 1).attr("stroke", '#ddd');
     this.parent.selectAll('path').attr("stroke-width", 1).attr("stroke", '#ddd');
