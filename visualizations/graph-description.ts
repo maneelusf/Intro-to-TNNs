@@ -108,8 +108,8 @@ export class GraphDescription {
       .enter()
       .append('line')
       .classed('vis', true)
-      .style("stroke", "#bbb")
-      .style("stroke-width", 1)
+      .attr("stroke", "#bbb")
+      .attr("stroke-width", 1)
       .attr("x1", (d) => pos(d.a.x)+positions[index][0])
       .attr("x2", (d) => pos(d.b.x)+positions[index][0])
       .attr("y1", (d) => pos(d.a.y))
@@ -119,8 +119,8 @@ export class GraphDescription {
       .enter()
       .append('line')
       .classed('target', true)
-      .style("stroke", "rgba(0, 0, 0, 0)")
-      .style("stroke-width", 10)
+      .attr("stroke", "rgba(0, 0, 0, 0)")
+      .attr("stroke-width", 10)
       .attr("x1", (d) => pos(d.a.x)+positions[index][0])
       .attr("x2", (d) => pos(d.b.x)+positions[index][0])
       .attr("y1", (d) => pos(d.a.y))
@@ -132,8 +132,8 @@ export class GraphDescription {
         .enter()
         .append('line')
         .classed('vis', true)
-        .style("stroke", "#bbb")
-        .style("stroke-width", 1)
+        .attr("stroke", "#bbb")
+        .attr("stroke-width", 1)
         .attr("x1", (d) => pos(d.a.x)+positions[index][0])
         .attr("x2", (d) => pos(d.b.x)+positions[index][0])
         .attr("y1", (d) => pos(d.a.y))
@@ -145,9 +145,9 @@ export class GraphDescription {
         .attr('r', 10)
         .attr('cx', (d) => pos(d.x)+positions[index][0])
         .attr('cy', (d) => pos(d.y))
-        .style('fill', "#c0dbe7")
-        .style("stroke-width", '1px')
-        .style("stroke", '#bbb')
+        .attr('fill', "#c0dbe7")
+        .attr("stroke-width", '1px')
+        .attr("stroke", '#bbb')
         .on('mouseover', () =>  this.highlightNodes(holder))
         .on('mouseout', () => this.unhighlightAll()); 
         
@@ -218,8 +218,8 @@ export class GraphDescription {
   highlightEdges(holder) {
     // this.parent.select('#E').classed('selected', true);
     holder.selectAll('line.vis')
-      .style("stroke", "#c27e9e")
-      .style("stroke-width", 5)
+      .attr("stroke", "#c27e9e")
+      .attr("stroke-width", 5)
   }
   highlightHyperEdge(holder,rect_property) {
     let data = holder.selectAll('rect.face_one').data();
@@ -267,14 +267,14 @@ export class GraphDescription {
     selectednodes.add(selectedPolygonData[j].i)  
     }
     holder.selectAll('circle')
-      .style("stroke-width", function(d) {
+      .attr("stroke-width", function(d) {
         if (selectednodes.has(d.i)) {
           return 5
         }
         else {
           return 2
         }})
-      .style("stroke", function(d) {
+      .attr("stroke", function(d) {
         if (selectednodes.has(d.i)) {
           return "#000"
         }
@@ -320,14 +320,13 @@ roundedPolygon(points, radius) {
   unhighlightAll() {
     this.selectedFaceIdx = -1;
     this.parent.selectAll('line.vis')
-      .style("stroke", "#bbb")
-      .style("stroke-width", '1px');
+      .attr("stroke", "#bbb")
+      .attr("stroke-width", '1px');
     
     this.parent.selectAll('polygon')
     .attr("fill","transparent")
     .attr("stroke-width",'1px')
     .attr("stroke","#bbb");
-    // .style("stroke","transparent");
 
     this.parent.selectAll('circle')
     .attr("stroke-width", '1px')
