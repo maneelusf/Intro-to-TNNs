@@ -26,6 +26,7 @@ export class GraphDescription {
   numNodes = 6;
   constructor() {
     const [nodes, links] = makeGraph(this.numNodes, this.numNodes * 2);
+
     this.showGraph(nodes, links);
     // this.showText();
   }
@@ -35,10 +36,10 @@ export class GraphDescription {
     const localScale = 200;
     const pos = (x) => (x + localOffset) * localScale;
     let selectedFaceIdx = -1;
-    const graphHolder = this.svg.append('g');
-    const simplicialHolder = this.svg.append('g');
-    const cellHolder = this.svg.append('g');
-    const hyperHolder = this.svg.append('g');
+    const graphHolder = this.svg.append('g').classed('graph-holder', true);
+    const simplicialHolder = this.svg.append('g').classed('simplicial-holder', true);
+    const cellHolder = this.svg.append('g').classed('cell-holder', true);
+    const hyperHolder = this.svg.append('g').classed('hyper-holder', true);
     const holders = [graphHolder, simplicialHolder, cellHolder, hyperHolder];
     const textElems = ["Graph Neural Network","Simipicial Cell Complex","Cell Complex","Combinatorial Complex"]
     const positions = [[5,2],[300,2],[605,2],[905,2]]
@@ -67,8 +68,6 @@ export class GraphDescription {
       if (holder == hyperHolder) {
         continue;
       }
-      // (d, i) => this.highlightFaces(holder)}
-      // (d, i) => {this.selectedFaceIdx = i;this.highlightFaces(holder)}
       if (holder == simplicialHolder) {
         holder.selectAll('polygon')
         .data(SimplicialcomplexFaces)
@@ -80,7 +79,6 @@ export class GraphDescription {
         .attr('fill','transparent')
         .attr('stroke', 'transparent')
       .attr('stroke-width', 2)
-      // .attr('stroke-dasharray', '5,5')
         .on('mouseover', (d, i) => {this.selectedFaceIdx = i;this.highlightFaces(holder)})
         .on('mouseout', () => this.unhighlightAll())}
       
@@ -95,21 +93,29 @@ export class GraphDescription {
         .attr('fill','transparent')
         .on('mouseover', (d, i) => {this.selectedFaceIdx = i;this.highlightFaces(holder)})
         .on('mouseout', () => this.unhighlightAll())}
+      // let links = links.slice(0, -1);
 
-      
+      if (holder == cellHolder) {
+        const selected_links = links.slice(1);
+        selected_links.splice(11,1);
+        selected_links.splice(11,1);
+      }
+      else {
+        const selected_links = links.slice(1);
+      }
       holder.selectAll('line.vis')
-      .data(links)
+      .data(selected_links)
       .enter()
       .append('line')
       .classed('vis', true)
-      .style("stroke", "#f7a3f6")
+      .style("stroke", "#bbb")
       .style("stroke-width", 1)
       .attr("x1", (d) => pos(d.a.x)+positions[index][0])
       .attr("x2", (d) => pos(d.b.x)+positions[index][0])
       .attr("y1", (d) => pos(d.a.y))
       .attr("y2", (d) => pos(d.b.y))
       holder.selectAll('line.target')
-      .data(links)
+      .data(selected_links)
       .enter()
       .append('line')
       .classed('target', true)
@@ -122,7 +128,7 @@ export class GraphDescription {
       .on('mouseover', () => this.highlightEdges(holder))
       .on('mouseout', () => this.unhighlightAll());
       holder.selectAll('line.vis')
-        .data(links)
+        .data(selected_links)
         .enter()
         .append('line')
         .classed('vis', true)
@@ -139,18 +145,18 @@ export class GraphDescription {
         .attr('r', 10)
         .attr('cx', (d) => pos(d.x)+positions[index][0])
         .attr('cy', (d) => pos(d.y))
-        .style('fill', '#ffa339')
+        .style('fill', "#c0dbe7")
         .style("stroke-width", '1px')
         .style("stroke", '#bbb')
         .on('mouseover', () =>  this.highlightNodes(holder))
         .on('mouseout', () => this.unhighlightAll()); 
         
   }
-  // Cell Complex is different from the others. 
-  
-
+      const hyper_holder_data = {'face_one':[1,2,3,4],'face_two':[2,3]:'face_three':[0,1,4],'face_four':[5,1],'path':[0,1,4]};
+      console.log(hyper_holder_data['face_one']);
+      const dataEntries = d3.entries(hyper_holder_data);
         hyperHolder.selectAll('rect.face_one')
-        .data([nodes[4],nodes[1]])
+        .data(dataEntries)
         .enter()
         .append('rect.face_one')
         .attr("x", pos(nodes[2].x)-30+positions[3][0])
@@ -159,8 +165,8 @@ export class GraphDescription {
         .attr("height", 200)
         .attr("rx", 30) // Set the x-axis radius for rounded corners
         .attr("ry", 30) // Set the y-axis radius for rounded corners
-        .style("fill", '#acbef6')
-        .style("fill-opacity", 0.5)
+        .attr("fill", "#87023e")
+        .attr("stroke","white")
         .on('mouseover', () => this.highlightHyperEdge(hyperHolder,"face_one"))
         .on('mouseout', () => this.unhighlightAll())
         
@@ -171,21 +177,9 @@ export class GraphDescription {
         .attr("height", 180)
         .attr("rx", 30) // Set the x-axis radius for rounded corners
         .attr("ry", 30) // Set the y-axis radius for rounded corners
-        .style("fill", "#f7a3f6")
-        .style("fill-opacity", 0.5)
+        .attr("fill", "#c27e9e")
+        .attr("stroke","white")
         .on('mouseover', () => this.highlightHyperEdge(hyperHolder,"face_two"))
-        .on('mouseout', () => this.unhighlightAll());
-        
-        hyperHolder.append('rect.face_three')
-        .attr("x", pos(nodes[2].x)-25+positions[3][0])
-        .attr("y", pos(nodes[2].y)-25)
-        .attr("width",170)
-        .attr("height", 50)
-        .attr("rx", 30) // Set the x-axis radius for rounded corners
-        .attr("ry", 30) // Set the y-axis radius for rounded corners
-        .style("fill", "#f7a3f6")
-        .style("fill-opacity", 0.5)
-        .on('mouseover', () => this.highlightHyperEdge(hyperHolder,"face_three"))
         .on('mouseout', () => this.unhighlightAll());
         
         hyperHolder.append('rect.face_four')
@@ -193,23 +187,22 @@ export class GraphDescription {
         .attr("y", pos(nodes[1].y)-25)
         .attr("width",123)
         .attr("height", 50)
-        .attr("rx", 30) // Set the x-axis radius for rounded corners
-        .attr("ry", 30) // Set the y-axis radius for rounded corners
+        .attr("rx", 30)
+        .attr("ry", 30)
         .attr("transform", "rotate(-45 " + (pos(nodes[1].x)+positions[3][0]) + " " + pos(nodes[1].y) + ")")
-        .style("fill", "#f7a3f6")
-        .style("fill-opacity", 0.5)
+        .attr("fill", "#87023e")
+        .attr("stroke","white")
         .on('mouseover', () => this.highlightHyperEdge(hyperHolder,"face_four"))
         .on('mouseout', () => this.unhighlightAll());
         const p = [{x: pos(nodes[0].x)+35+positions[3][0], y: pos(nodes[0].y)}, {x: pos(nodes[4].x)-15+positions[3][0], y: pos(nodes[4].y)+35},
          {x: pos(nodes[1].x)-15+positions[3][0], y: pos(nodes[1].y)-35}]  
         const path = this.roundedPolygon(p, 25);
-        // console.log(path);
         hyperHolder.append('path')
           .attr('d',path)
-          .style('fill', '#acbef6')
-          .style("fill-opacity", 0.5)
+          .attr('fill', "#c27e9e")
+          .attr("stroke","white")
         .on('mouseover', () => this.highlightHyperEdge(hyperHolder,"path"))
-        .on('mouseout', () => this.unhighlightAll());;  
+        .on('mouseout', () => this.unhighlightAll());
         hyperHolder.selectAll('circle')
         .data(nodes)
         .enter()
@@ -217,7 +210,7 @@ export class GraphDescription {
         .attr('r', 10)
         .attr('cx', (d) => pos(d.x)+positions[3][0])
         .attr('cy', (d) => pos(d.y))
-        .style('fill', '#ffa339')
+        .attr('fill', "#c0dbe7")
         .on('mouseover', () =>  this.highlightNodes(hyperHolder))
         .on('mouseout', () => this.unhighlightAll()); 
 
@@ -225,49 +218,39 @@ export class GraphDescription {
   highlightEdges(holder) {
     // this.parent.select('#E').classed('selected', true);
     holder.selectAll('line.vis')
-      .style("stroke", "#f7a3f6")
+      .style("stroke", "#c27e9e")
       .style("stroke-width", 5)
   }
   highlightHyperEdge(holder,rect_property) {
-    const data = holder.selectAll('circle').data();
-
-// Create circles based on the selected data
-holder.selectAll('circle')
-    .data(data)  // Bind data to circles
-    .enter()     // Enter selection for new data
-    .append('circle')  // Append circle for each data point
-    .attr('cx', d => pos(d.x)+positions[3][0])  // Set x-coordinate based on data
-    .attr('cy', d => pos(d.y))  // Set y-coordinate based on data
-    .attr('r', 15)  // Set radius
-    .style('fill', 'red');  // Set fill color
-      holder.selectAll(`rect.${rect_property}`)
-      .attr("fill","black")
-    .attr("stroke","black")
-    .attr("stroke-width", 2)
+    let data = holder.selectAll('rect.face_one').data();
+    const dict_values = {'face_one':0,'face_two':1,'face_three':2,'face_four':3,'path':4};
+    const select_index = data[dict_values[rect_property]].value;
+    holder.selectAll('circle')
+    .attr("stroke",(d, i) => (select_index.includes(i)) ? "black" : "#c0dbe7")
+    .attr("stroke-width", (d, i) => (select_index.includes(i)) ? 5 : 2);
+    holder.selectAll(`rect.${rect_property}`)
+    .attr("stroke","white")
+    .attr("stroke-width", 2);
     if (rect_property == "path" )
     {holder.selectAll('path')
-    .attr("fill","black")
-  .attr("stroke","black")
-  .attr("stroke-width", 2)}
-    
+  .attr("stroke","white")
+  .attr("stroke-width", 2)}  
   }
 
   highlightFaces(holder) {
     let selectedPolygonData;
-    
-      
     holder.selectAll('polygon')
     .attr("fill", (d, i) => {
       if (this.selectedFaceIdx == i) {
           selectedPolygonData = d; // Store the data where selectedFaceIdx == i
-          return '#acbef6';
+          return '#87023e';
       } else {
           return "transparent";
       }
   })
   .attr("stroke", (d, i) => {
     if (this.selectedFaceIdx == i) {
-        return "#f7a3f6";
+        return "#c27e9e";
     } else {
         return "transparent";
     }
@@ -321,16 +304,14 @@ roundedPolygon(points, radius) {
   return path;
 }
 
-  highlightNodes(holder) {
-    // this.parent.select('#V').classed('selected', true);
+  highlightNodes(holder) {   
     holder.selectAll('circle')
-      .style("stroke-width", 2)
-      .style("stroke", '#000')
+      .attr("stroke-width", 2)
+      .attr("stroke", '#000')
       .attr("r", 11)
-  }
+}
 
   highlightGlobal() {
-    // this.parent.select('#U').classed('selected', true);
     this.parent.selectAll('rect')
       .style("stroke", '#000')
       .style("stroke-width", 8);
@@ -349,14 +330,9 @@ roundedPolygon(points, radius) {
     // .style("stroke","transparent");
 
     this.parent.selectAll('circle')
-    .style("stroke-width", '1px')
-    .style("stroke", '#aaa')
+    .attr("stroke-width", '1px')
+    .attr("stroke", '#aaa')
     .attr("r", 10);
-
-    // this.parent.selectAll('rect')
-    //   .style("stroke-width", 2)
-    //   .style("stroke")
-    //   .style("stroke", '#ddd')
 
       this.parent.selectAll('rect')
       .attr("stroke-width", 1)

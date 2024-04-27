@@ -373,8 +373,7 @@ export class Table {
         return;
       }
       }
-  
-
+      
   unhighlightAll(holder,ref_holder) {
     this.selectedEdge = -1;
     this.selectedNode = -1;
