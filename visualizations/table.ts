@@ -1,19 +1,4 @@
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
+
 import * as d3 from 'd3';
 import { makeGraph, sleep } from '../utils';
 export class Table {
@@ -25,45 +10,37 @@ export class Table {
     //create the required data.
     const [nodes,links] = makeGraph(this.numNodes, this.numNodes * 2);
     const faces = [[nodes[4],nodes[1],nodes[2]],[nodes[2],nodes[4],nodes[3]],[nodes[0],nodes[1],nodes[4]]]
-    nodes.rank = 0;
-    links.rank = 1;
-    faces.rank = 2;
     this.faces = faces;
     this.links = links;
     this.nodes = nodes;
     const link = document.createElement('link', { rel: 'stylesheet', href: 'table.css' });
     document.getElementById('table').appendChild(link);  
-    // Create the table element
     const table = document.createElement('table');
     table.className = 'table-holder';
-    // Create the header row
+    const prologueRow = document.createElement('tr');
+    prologueRow.className = 'prologue';
+    const prologueHeader = document.createElement('th');
+    prologueHeader.className = 'prologue-header';
+    prologueHeader.rowSpan = 1;
+    prologueHeader.colSpan = 3;
     const headerRow = document.createElement('tr');
     headerRow.className = 'row-header';
     // Create the header cells
     const matrixHeader = document.createElement('th');
     matrixHeader.className = 'neighborhood-matrix';
-    matrixHeader.rowSpan = 1;
-    matrixHeader.innerHTML = '<b>Neighborhood</b><br><b>Matrix</b>';
-    
+    matrixHeader.innerHTML = '<b>Neighborhood</b><br><b>Matrix</b>'; 
     const structureHeader = document.createElement('th');
     structureHeader.className = 'neighborhood-structure';
-    structureHeader.rowSpan = 1;
     structureHeader.innerHTML = '<b>Neighborhood</b><br><b>Structure</b>';
-    
     const complexHeader = document.createElement('th');
     complexHeader.className = 'cell-complex';
-    complexHeader.colSpan = 1;
     complexHeader.innerHTML = '<b>Cell Complex</b>';
-    
     // Append header cells to header row
+    prologueRow.appendChild(prologueHeader);     
+
     headerRow.appendChild(matrixHeader);
     headerRow.appendChild(structureHeader);
     headerRow.appendChild(complexHeader);
-    
-    
-    // Create the second row
-    const secondRow = document.createElement('tr');
-    secondRow.className = 'row-header';
     const neighborhoodstructure = ["boundary","co-boundary","lower-adjacent","upper-adjacent"]
     const neighborhoodstructurehtml = 
     [
@@ -72,8 +49,13 @@ export class Table {
       'Lower adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a boundary z with y</span>',
       'Upper adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a co-boundary z with y</span>',
     ] 
+    table.appendChild(prologueRow);
     table.appendChild(headerRow);
-    table.appendChild(secondRow);
+
+
+    // const ex1 = svg_one.append('g');
+    // const ex2 = svg_one.append('g')
+
     for (let i = 0; i <neighborhoodstructure.length; i++) {
       const boundaryRow = document.createElement('tr');
       boundaryRow.className = neighborhoodstructure[i];
@@ -82,16 +64,12 @@ export class Table {
       boundaryCell1.innerHTML = neighborhoodstructurehtml[i];
       const boundaryCell2 = document.createElement('td');
       boundaryCell2.className = `${neighborhoodstructure[i]}one`; // Give an ID to the cell for appending SVG
-      // boundaryCell2.innerHTML = 'Lorem Ipsum';
       const boundaryCell3 = document.createElement('td');
       boundaryCell3.className = `${neighborhoodstructure[i]}two`; // Give an ID to the cell for appending SVG
-      // Append boundary cells to boundary row
       boundaryRow.appendChild(boundaryCell1);
       boundaryRow.appendChild(boundaryCell2);
       boundaryRow.appendChild(boundaryCell3);
       table.appendChild(boundaryRow);
-      
-
     }
     document.getElementById('table').appendChild(table);
     for (let i = 0; i < neighborhoodstructure.length; i++) {
@@ -100,21 +78,21 @@ export class Table {
     if (i == 2 || i == 3 ) {
       const imgElementone = document.createElement('img');
       imgElementone.src =  `imgs/${neighborhoodstructure[i]}-one.png`; // Set the source path of your image
-      imgElementone.style.width = '115%'
+      imgElementone.style.width = '105%'
       imgElementone.style.height = '130%';
       imgElementone.style.marginLeft = '-7px'
       
       boundary1Cell.appendChild(imgElementone)
       imgElement.src =  `imgs/${neighborhoodstructure[i]}-two.png`; // Set the source path of your image
-      imgElement.style.width = '115%'
+      imgElement.style.width = '105%'
       imgElement.style.height = '130%';
-      imgElement.style.marginLeft = '-7px'
+      imgElement.style.marginLeft = '-1px'
       imgElement.style.borderTop = '1px solid #ddd';
       boundary1Cell.appendChild(imgElement)}
     
     else {
     imgElement.src =  `imgs/${neighborhoodstructure[i]}.png`; // Set the source path of your image
-    imgElement.style.width = '115%'
+    imgElement.style.width = '105%'
     imgElement.style.height = '130%';
     imgElement.style.marginLeft = '-7px'
     imgElement.style.zIndex = '-1';
@@ -162,18 +140,104 @@ export class Table {
           this.mouseoverupperadjacent(ex1,ex2);
         }
     });
-
-
+    const localOffset = 0.6;
+    const localScale = 150;
+    const pos = (x) => (x + localOffset) * localScale;  
+    const svgContainer = d3.select('th.prologue-header').append('svg')
+    .attr('width', 750)
+    .attr('height', 200);
+    const ex3 = svgContainer.append('g');
+    this.drawPrologue(ex3);
     
+}
+    // Append any necessary elements to the SVG container
+  drawPrologue(holder) {
+    const localOffset = 0.3;
+    const localScale = 120;
+    const pos = (x) => (x + localOffset) * localScale; 
+    const textelements = ["Examples on this complex"]
+    const positions = [{'x':30,'y':80,'color':'white','circle_text':'r','side_text':'All r-cells in the complex'}, 
+    {'x':30,'y':130,'color':"#c0dbe7",'circle_text':'','side_text':'All 0-cells in the complex'},
+     {'x':250,'y':80,'color':"#c27e9e",'circle_text':'','side_text':'All 1-cells in the complex'}, 
+     {'x':250,'y':130,'color':'#87023e','circle_text':'','side_text':'All 2-cells in the complex'}];
+    for (let position of positions) {
+      holder.append('circle')
+      .attr('cx', position.x) // Set the x-coordinate of the center of the circle
+      .attr('cy', position.y) // Set the y-coordinate of the center of the circle
+      .attr('r', 10) // Set the radius of the circle
+      .attr('fill', position.color)
+      .attr('stroke','black');
+      holder.append('text')
+      .attr('x', position.x) // Set the x-coordinate of the text (center of the circle)
+      .attr('y', position.y) // Set the y-coordinate of the text (center of the circle)
+      .attr('text-anchor', 'middle') // Center the text horizontally
+      .attr('dominant-baseline', 'central') // Center the text vertically
+      // .attr('fill', 'black') // Set the color of the text
+      .style('font-size', '14px') // Set the font size of the text
+      .style('font-family', 'inherit')
+      .style('font-weight', 'normal')
+      .text(position.circle_text);
+      holder.append('text')
+      .attr('x', position.x+20) // Set the x-coordinate of the text (center of the circle)
+      .attr('y', position.y+5) // Set the y-coordinate of the text (center of the circle)
+      // .attr('fill', 'black') // Set the color of the text
+      .style('font-size', '14px') // Set the font size of the text
+      .style('font-family', 'inherit')
+      .style('font-weight', 'normal')
+      .text(position.side_text);
+    }
+    holder.append('text')
+      .attr('x', 480) // Set the x-coordinate of the text (center of the circle)
+      .attr('y', 170) // Set the y-coordinate of the text (center of the circle)
+      .style('font-size', '14px') // Set the font size of the text
+      .style('font-family', 'inherit')
+      .style('font-weight', 'normal')
+      .text("Examples based on this complex");  
+      holder.append('text')
+      .attr('x', 25) // Set the x-coordinate of the text (center of the circle)
+      .attr('y', 195) // Set the y-coordinate of the text (center of the circle)
+      .style('font-size', '14px') // Set the font size of the text
+      .style('font-family', 'inherit')
+      .style('font-weight', 'normal')
+      .style('fill', '#a0a0a0')
+      .text("Please hover over the complex on the left side to understand the message passing between the various cells.");
+      holder.selectAll(`polygon`)
+      .data(this.faces)
+      .enter()
+      .append('polygon')
+      .attr('points', (d) => {
+      const points = d.map(node => `${pos(node.x)+550},${pos(node.y)+50}`).join(' ');
+      return points})
+      .attr('fill','#87023e')
+      .attr('stroke', 'transparent')
+    .attr('stroke-width', 2);
+    holder.selectAll('line.vis')
+      .data(this.links)
+      .enter()
+      .append('line')
+      .classed('vis', true)
+      .style("stroke",  "#c27e9e")
+      .style("stroke-width", 5)
+      .attr("x1", (d) => pos(d.a.x)+ 550)
+      .attr("x2", (d) => pos(d.b.x)+ 550)
+      .attr("y1", (d) => pos(d.a.y)+50)
+      .attr("y2", (d) => pos(d.b.y)+50);
+    holder.selectAll('circle.diagram')
+    .data(this.nodes)
+    .enter()
+    .append('circle')
+    .attr('r', 10)
+    .attr('cx', (d) => pos(d.x) + 550)
+    .attr('cy', (d) => pos(d.y)+50)
+    .attr('fill', "#c0dbe7")
+    .attr('stroke-width', '1px')
+    .attr('stroke', '#bbb');
     
-    // this.drawDiagram(ex1,ex2,30,0,true);
-    // this.drawDiagram(ex2,ex1,250,0,false);
   }
   drawDiagram(holder,x,y) {
     const localOffset = 0.6;
     const localScale = 150;
     const pos = (x) => (x + localOffset) * localScale;  
-
     holder.selectAll(`polygon`)
         .data(this.faces)
         .enter()
@@ -412,3 +476,4 @@ export class Table {
       const filteredlinks = links.filter(link => (link.a.i == nodes.i) || (link.b.i == nodes.i));
       return filteredlinks
   }
+}

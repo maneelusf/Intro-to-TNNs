@@ -1,12 +1,22 @@
 .table-holder {
     border: 1px solid #ddd;
-    font-size: 14px;
-    width: 100%;
+    width: 750px;
+  }
+
+td {
+    border: 1px solid #ddd;
+  }
+
+tr.prologue {
+  border: 1px solid #fff;
+  height: 200px;
+  
   }
 
 .row-header {
   background-color: #feebd0;
   border: 1px solid #ddd;
+  
 }
 
 .neighborhood-matrix,
@@ -18,13 +28,5 @@
     border: 1px solid #ddd;
     text-align: center;
   }
-td {
-    border: 1px solid #ddd;
-  }
-  /* .boundary {
-    height: 200px;
-    width: 15%;
-    border: 1px solid #ddd;
 
-  } */
   
