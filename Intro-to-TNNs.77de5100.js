@@ -26870,22 +26870,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Table = void 0;
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
 var d3 = __importStar(require("d3"));
 var utils_1 = require("../utils");
 var Table = /** @class */function () {
@@ -26900,9 +26884,6 @@ var Table = /** @class */function () {
       nodes = _a[0],
       links = _a[1];
     var faces = [[nodes[4], nodes[1], nodes[2]], [nodes[2], nodes[4], nodes[3]], [nodes[0], nodes[1], nodes[4]]];
-    nodes.rank = 0;
-    links.rank = 1;
-    faces.rank = 2;
     this.faces = faces;
     this.links = links;
     this.nodes = nodes;
@@ -26911,36 +26892,37 @@ var Table = /** @class */function () {
       href: 'table.css'
     });
     document.getElementById('table').appendChild(link);
-    // Create the table element
     var table = document.createElement('table');
     table.className = 'table-holder';
-    // Create the header row
+    var prologueRow = document.createElement('tr');
+    prologueRow.className = 'prologue';
+    var prologueHeader = document.createElement('th');
+    prologueHeader.className = 'prologue-header';
+    prologueHeader.rowSpan = 1;
+    prologueHeader.colSpan = 3;
     var headerRow = document.createElement('tr');
     headerRow.className = 'row-header';
     // Create the header cells
     var matrixHeader = document.createElement('th');
     matrixHeader.className = 'neighborhood-matrix';
-    matrixHeader.rowSpan = 1;
     matrixHeader.innerHTML = '<b>Neighborhood</b><br><b>Matrix</b>';
     var structureHeader = document.createElement('th');
     structureHeader.className = 'neighborhood-structure';
-    structureHeader.rowSpan = 1;
     structureHeader.innerHTML = '<b>Neighborhood</b><br><b>Structure</b>';
     var complexHeader = document.createElement('th');
     complexHeader.className = 'cell-complex';
-    complexHeader.colSpan = 1;
     complexHeader.innerHTML = '<b>Cell Complex</b>';
     // Append header cells to header row
+    prologueRow.appendChild(prologueHeader);
     headerRow.appendChild(matrixHeader);
     headerRow.appendChild(structureHeader);
     headerRow.appendChild(complexHeader);
-    // Create the second row
-    var secondRow = document.createElement('tr');
-    secondRow.className = 'row-header';
     var neighborhoodstructure = ["boundary", "co-boundary", "lower-adjacent", "upper-adjacent"];
     var neighborhoodstructurehtml = ['Boundary<br><span style="font-size: smaller; font-style: italic;">All y-connected cells x cells of next lower rank</span>', 'Co-boundary<br><span style="font-size: smaller; font-style: italic;">All y-connected cells x cells of next higher rank</span>', 'Lower adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a boundary z with y</span>', 'Upper adjacent<br><span style="font-size: smaller; font-style: italic;">All x cells sharing a co-boundary z with y</span>'];
+    table.appendChild(prologueRow);
     table.appendChild(headerRow);
-    table.appendChild(secondRow);
+    // const ex1 = svg_one.append('g');
+    // const ex2 = svg_one.append('g')
     for (var i = 0; i < neighborhoodstructure.length; i++) {
       var boundaryRow = document.createElement('tr');
       boundaryRow.className = neighborhoodstructure[i];
@@ -26949,10 +26931,8 @@ var Table = /** @class */function () {
       boundaryCell1.innerHTML = neighborhoodstructurehtml[i];
       var boundaryCell2 = document.createElement('td');
       boundaryCell2.className = neighborhoodstructure[i] + "one"; // Give an ID to the cell for appending SVG
-      // boundaryCell2.innerHTML = 'Lorem Ipsum';
       var boundaryCell3 = document.createElement('td');
       boundaryCell3.className = neighborhoodstructure[i] + "two"; // Give an ID to the cell for appending SVG
-      // Append boundary cells to boundary row
       boundaryRow.appendChild(boundaryCell1);
       boundaryRow.appendChild(boundaryCell2);
       boundaryRow.appendChild(boundaryCell3);
@@ -26965,19 +26945,19 @@ var Table = /** @class */function () {
       if (i == 2 || i == 3) {
         var imgElementone = document.createElement('img');
         imgElementone.src = "imgs/" + neighborhoodstructure[i] + "-one.png"; // Set the source path of your image
-        imgElementone.style.width = '115%';
+        imgElementone.style.width = '105%';
         imgElementone.style.height = '130%';
         imgElementone.style.marginLeft = '-7px';
         boundary1Cell.appendChild(imgElementone);
         imgElement.src = "imgs/" + neighborhoodstructure[i] + "-two.png"; // Set the source path of your image
-        imgElement.style.width = '115%';
+        imgElement.style.width = '105%';
         imgElement.style.height = '130%';
-        imgElement.style.marginLeft = '-7px';
+        imgElement.style.marginLeft = '-1px';
         imgElement.style.borderTop = '1px solid #ddd';
         boundary1Cell.appendChild(imgElement);
       } else {
         imgElement.src = "imgs/" + neighborhoodstructure[i] + ".png"; // Set the source path of your image
-        imgElement.style.width = '115%';
+        imgElement.style.width = '105%';
         imgElement.style.height = '130%';
         imgElement.style.marginLeft = '-7px';
         imgElement.style.zIndex = '-1';
@@ -27011,9 +26991,96 @@ var Table = /** @class */function () {
         _this.mouseoverupperadjacent(ex1, ex2);
       }
     });
-    // this.drawDiagram(ex1,ex2,30,0,true);
-    // this.drawDiagram(ex2,ex1,250,0,false);
+    var localOffset = 0.6;
+    var localScale = 150;
+    var pos = function pos(x) {
+      return (x + localOffset) * localScale;
+    };
+    var svgContainer = d3.select('th.prologue-header').append('svg').attr('width', 750).attr('height', 200);
+    var ex3 = svgContainer.append('g');
+    this.drawPrologue(ex3);
   }
+  // Append any necessary elements to the SVG container
+  Table.prototype.drawPrologue = function (holder) {
+    var localOffset = 0.3;
+    var localScale = 120;
+    var pos = function pos(x) {
+      return (x + localOffset) * localScale;
+    };
+    var textelements = ["Examples on this complex"];
+    var positions = [{
+      'x': 30,
+      'y': 80,
+      'color': 'white',
+      'circle_text': 'r',
+      'side_text': 'All r-cells in the complex'
+    }, {
+      'x': 30,
+      'y': 130,
+      'color': "#c0dbe7",
+      'circle_text': '',
+      'side_text': 'All 0-cells in the complex'
+    }, {
+      'x': 250,
+      'y': 80,
+      'color': "#c27e9e",
+      'circle_text': '',
+      'side_text': 'All 1-cells in the complex'
+    }, {
+      'x': 250,
+      'y': 130,
+      'color': '#87023e',
+      'circle_text': '',
+      'side_text': 'All 2-cells in the complex'
+    }];
+    for (var _i = 0, positions_1 = positions; _i < positions_1.length; _i++) {
+      var position = positions_1[_i];
+      holder.append('circle').attr('cx', position.x) // Set the x-coordinate of the center of the circle
+      .attr('cy', position.y) // Set the y-coordinate of the center of the circle
+      .attr('r', 10) // Set the radius of the circle
+      .attr('fill', position.color).attr('stroke', 'black');
+      holder.append('text').attr('x', position.x) // Set the x-coordinate of the text (center of the circle)
+      .attr('y', position.y) // Set the y-coordinate of the text (center of the circle)
+      .attr('text-anchor', 'middle') // Center the text horizontally
+      .attr('dominant-baseline', 'central') // Center the text vertically
+      // .attr('fill', 'black') // Set the color of the text
+      .style('font-size', '14px') // Set the font size of the text
+      .style('font-family', 'inherit').style('font-weight', 'normal').text(position.circle_text);
+      holder.append('text').attr('x', position.x + 20) // Set the x-coordinate of the text (center of the circle)
+      .attr('y', position.y + 5) // Set the y-coordinate of the text (center of the circle)
+      // .attr('fill', 'black') // Set the color of the text
+      .style('font-size', '14px') // Set the font size of the text
+      .style('font-family', 'inherit').style('font-weight', 'normal').text(position.side_text);
+    }
+    holder.append('text').attr('x', 480) // Set the x-coordinate of the text (center of the circle)
+    .attr('y', 170) // Set the y-coordinate of the text (center of the circle)
+    .style('font-size', '14px') // Set the font size of the text
+    .style('font-family', 'inherit').style('font-weight', 'normal').text("Examples based on this complex");
+    holder.append('text').attr('x', 25) // Set the x-coordinate of the text (center of the circle)
+    .attr('y', 195) // Set the y-coordinate of the text (center of the circle)
+    .style('font-size', '14px') // Set the font size of the text
+    .style('font-family', 'inherit').style('font-weight', 'normal').style('fill', '#a0a0a0').text("Please hover over the complex on the left side to understand the message passing between the various cells.");
+    holder.selectAll("polygon").data(this.faces).enter().append('polygon').attr('points', function (d) {
+      var points = d.map(function (node) {
+        return pos(node.x) + 550 + "," + (pos(node.y) + 50);
+      }).join(' ');
+      return points;
+    }).attr('fill', '#87023e').attr('stroke', 'transparent').attr('stroke-width', 2);
+    holder.selectAll('line.vis').data(this.links).enter().append('line').classed('vis', true).style("stroke", "#c27e9e").style("stroke-width", 5).attr("x1", function (d) {
+      return pos(d.a.x) + 550;
+    }).attr("x2", function (d) {
+      return pos(d.b.x) + 550;
+    }).attr("y1", function (d) {
+      return pos(d.a.y) + 50;
+    }).attr("y2", function (d) {
+      return pos(d.b.y) + 50;
+    });
+    holder.selectAll('circle.diagram').data(this.nodes).enter().append('circle').attr('r', 10).attr('cx', function (d) {
+      return pos(d.x) + 550;
+    }).attr('cy', function (d) {
+      return pos(d.y) + 50;
+    }).attr('fill', "#c0dbe7").attr('stroke-width', '1px').attr('stroke', '#bbb');
+  };
   Table.prototype.drawDiagram = function (holder, x, y) {
     var localOffset = 0.6;
     var localScale = 150;
